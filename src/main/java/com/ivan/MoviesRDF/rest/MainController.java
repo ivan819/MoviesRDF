@@ -18,4 +18,16 @@ public class MainController {
 
         return catDBO.test();
     }
+
+    @GetMapping(value = "/home")
+    public String home() {
+
+        return "index";
+    }
+
+    @GetMapping(value = "/movie")
+    public String movies() {
+
+        return "index2";
+    }
 }
