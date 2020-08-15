@@ -25,4 +25,10 @@ public class CastMember extends Member {
         this.character = character;
     }
 
+    public CastMember(Long id, String name, Integer order, String character) {
+        super(id, name);
+        this.order = order;
+        this.character = character;
+    }
+
 }

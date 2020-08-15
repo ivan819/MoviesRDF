@@ -19,10 +19,10 @@ public class Movie {
     private String releaseDate;
     private Integer runtime;
 
-    private List<Category> genres;
-    private List<Category> keywords;
-    private List<Category> productionCompanies;
-    private List<Category> productionCountries;
+    private List<Genre> genres;
+    private List<String> keywords;
+    private List<Company> productionCompanies;
+    private List<String> productionCountries;
 
     private List<CrewMember> crewMembers;
     private List<CastMember> castMembers;
@@ -51,25 +51,9 @@ public class Movie {
         this.title = title;
     }
 
-    public List<Category> getGenres() {
-        return genres;
-    }
-
-    public void setGenres(List<Category> genres) {
-        this.genres = genres;
-    }
-
     @Override
     public String toString() {
         return "Movie [genres=" + genres + ", id=" + id + ", title=" + title + "]";
-    }
-
-    public List<Category> getKeywords() {
-        return keywords;
-    }
-
-    public void setKeywords(List<Category> keywords) {
-        this.keywords = keywords;
     }
 
     public Long getBudget() {
@@ -150,22 +134,6 @@ public class Movie {
         this.runtime = runtime;
     }
 
-    public List<Category> getProductionCompanies() {
-        return productionCompanies;
-    }
-
-    public void setProductionCompanies(List<Category> productionCompanies) {
-        this.productionCompanies = productionCompanies;
-    }
-
-    public List<Category> getProductionCountries() {
-        return productionCountries;
-    }
-
-    public void setProductionCountries(List<Category> productionCountries) {
-        this.productionCountries = productionCountries;
-    }
-
     public List<CrewMember> getCrewMembers() {
         return crewMembers;
     }
@@ -192,6 +160,38 @@ public class Movie {
         if (this.id == null)
             id = -1L;
         return this.id.hashCode();
+    }
+
+    public List<Genre> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(List<Genre> genres) {
+        this.genres = genres;
+    }
+
+    public List<String> getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(List<String> keywords) {
+        this.keywords = keywords;
+    }
+
+    public List<Company> getProductionCompanies() {
+        return productionCompanies;
+    }
+
+    public void setProductionCompanies(List<Company> productionCompanies) {
+        this.productionCompanies = productionCompanies;
+    }
+
+    public List<String> getProductionCountries() {
+        return productionCountries;
+    }
+
+    public void setProductionCountries(List<String> productionCountries) {
+        this.productionCountries = productionCountries;
     }
 
 }

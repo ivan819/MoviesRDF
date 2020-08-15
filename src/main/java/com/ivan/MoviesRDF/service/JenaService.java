@@ -7,11 +7,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ivan.MoviesRDF.enitity.CastMember;
 import com.ivan.MoviesRDF.enitity.Company;
+import com.ivan.MoviesRDF.enitity.CrewMember;
 import com.ivan.MoviesRDF.enitity.Genre;
 import com.ivan.MoviesRDF.enitity.Member;
+import com.ivan.MoviesRDF.enitity.Movie;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -22,7 +24,6 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
@@ -48,9 +49,13 @@ public class JenaService {
 
     public List<Genre> getGenreList() {
         List<Genre> resultList = new ArrayList<>();
-        String queryString = "SELECT ?label (count(distinct ?movie) as ?count) WHERE { ?genre <" + RDF + "type> <"
-                + DBPEDIA + "Genre" + "> . ?genre <" + RDFS + "label> ?label . ?movie <" + DBPEDIA
-                + "genre> ?genre } GROUP BY ?label";
+        String queryString = "SELECT ?label (count(?movie) as ?count)";
+        queryString += "WHERE { ";
+        queryString += "?genre " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Genre") + " . ";
+        queryString += "?genre " + stringXML(RDFS, "label") + " ?label . ";
+        queryString += "?movie " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Film") + " . ";
+        queryString += "?movie " + stringXML(DBPEDIA, "genre") + " ?genre . ";
+        queryString += "} GROUP BY ?label";
 
         QueryExecution qexec = executeQuery(queryString);
         ResultSet results = qexec.execSelect();
@@ -65,12 +70,35 @@ public class JenaService {
         return resultList;
     }
 
+    public List<Genre> getGenreList(Long movieId) {
+        List<Genre> resultList = new ArrayList<>();
+        String queryString = "SELECT ?label ";
+        queryString += "WHERE { ";
+        queryString += "?genre " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Genre") + " . ";
+        queryString += "?genre " + stringXML(RDFS, "label") + " ?label . ";
+        queryString += "?movie " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Film") + " . ";
+        queryString += "?movie " + stringXML(WBS, "id") + " " + movieId + " . ";
+        queryString += "?movie " + stringXML(DBPEDIA, "genre") + " ?genre . ";
+        queryString += "}";
+
+        QueryExecution qexec = executeQuery(queryString);
+        ResultSet results = qexec.execSelect();
+        while (results.hasNext()) {
+            QuerySolution soln = results.nextSolution();
+            RDFNode label = soln.get("label");
+            resultList.add(new Genre(label.toString(), -1));
+        }
+
+        qexec.close();
+        return resultList;
+    }
+
     public List<Company> getCompanyList() {
         List<Company> resultList = new ArrayList<>();
         String queryString = "";
-        queryString += "SELECT ?label (count(distinct ?movie) as ?count) (sum(?revenue) as ?sum) ";
+        queryString += "SELECT ?label (count(?movie) as ?count) (sum(?revenue) as ?sum) ";
         queryString += "WHERE { ";
-        queryString += "?company " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Company") + ". ";
+        queryString += "?company " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Company") + " . ";
         queryString += "?company " + stringXML(RDFS, "label") + " ?label . ";
         queryString += "?movie " + stringXML(DBPEDIA, "producedBy") + " ?company . ";
         queryString += "?movie " + stringXML(DBPEDIA, "revenue") + " ?revenue ";
@@ -105,7 +133,6 @@ public class JenaService {
         QueryExecution qexec = executeQuery(queryString);
         ResultSet results = qexec.execSelect();
         while (results.hasNext()) {
-            System.out.println("hasnextr");
             QuerySolution soln = results.nextSolution();
             RDFNode label = soln.get("label");
             Literal idd = soln.getLiteral("id");
@@ -115,6 +142,51 @@ public class JenaService {
 
         qexec.close();
         return member;
+    }
+
+    // TODO
+    public List<CastMember> getCastMembers(Long movieId) {
+        List<CastMember> resultList = new ArrayList<>();
+
+        String queryString = "";
+        queryString += "SELECT ?id ?label ";
+        queryString += "WHERE { ";
+        queryString += "?member " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Person") + ". ";
+        queryString += "?member " + stringXML(RDFS, "label") + " ?label . ";
+        queryString += "?member " + stringXML(WBS, "id") + " " + movieId + " . ";
+        queryString += "?member " + stringXML(WBS, "id") + " ?id . ";
+        queryString += "} ";
+
+        QueryExecution qexec = executeQuery(queryString);
+        ResultSet results = qexec.execSelect();
+        while (results.hasNext()) {
+            QuerySolution soln = results.nextSolution();
+
+            RDFNode label = soln.get("label");
+            Literal idd = soln.getLiteral("id");
+
+            resultList.add(new CastMember(idd.getLong(), label.toString()));
+        }
+
+        qexec.close();
+        return null;
+    }
+
+    public List<CrewMember> getCrewMembers(Long movieId) {
+        return null;
+    }
+
+    public List<String> getKeywords(Long movieId) {
+        return null;
+    }
+
+    // TODO overloaded
+    public List<Movie> getMovieList() {
+        return null;
+    }
+
+    public Movie getMovie(Long movieId) {
+        return null;
     }
 
     private QueryExecution executeQuery(String queryString) {

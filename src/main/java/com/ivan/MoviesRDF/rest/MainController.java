@@ -36,6 +36,13 @@ public class MainController {
         return jenaService.getGenreList();
     }
 
+    @GetMapping(value = "/genres1")
+    @ResponseBody
+    public List<Genre> getTest12Data() {
+
+        return jenaService.getGenreList(71864L);
+    }
+
     @GetMapping(value = "/companies")
     @ResponseBody
     public List<Company> getTest11Data() {
