@@ -1,8 +1,21 @@
 package com.ivan.MoviesRDF.rest;
 
-import com.ivan.MoviesRDF.dbo.CategoryDBO;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import com.ivan.MoviesRDF.enitity.Company;
+import com.ivan.MoviesRDF.enitity.Genre;
+import com.ivan.MoviesRDF.service.JenaService;
+
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,14 +23,22 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class MainController {
+
     @Autowired
-    CategoryDBO catDBO;
+    JenaService jenaService;
 
-    @GetMapping(value = "/test")
+    @GetMapping(value = "/genres")
     @ResponseBody
-    public String getTestData() {
+    public List<Genre> getTest1Data() {
 
-        return catDBO.test();
+        return jenaService.getGenreList();
+    }
+
+    @GetMapping(value = "/companies")
+    @ResponseBody
+    public List<Company> getTest11Data() {
+        return jenaService.getCompanyList().stream().sorted(Comparator.comparing(Company::getRevenue).reversed())
+                .collect(Collectors.toList());
     }
 
     @GetMapping(value = "/home")
@@ -33,10 +54,14 @@ public class MainController {
     }
 
     @ResponseBody
-    @GetMapping(value = "/data")
-    public Response<?> data() {
-        // File file = ResourceUtils.getFile("classpath:application.properties");
+    @GetMapping(value = "/data", produces = { "text/turtle" })
+    public ResponseEntity<?> data() throws IOException {
+        File file = ResourceUtils.getFile("classpath:movies.ttl");
+        InputStream fileStream = new FileInputStream(file);
+        byte[] bytes = IOUtils.toByteArray(fileStream);
+        System.out.println("loaded and returned");
 
-        return ResourceUtils.getFile("classpath:application.properties");
+        fileStream.close();
+        return new ResponseEntity<>(bytes, HttpStatus.OK);
     }
 }
