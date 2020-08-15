@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.ivan.MoviesRDF.enitity.Company;
 import com.ivan.MoviesRDF.enitity.Genre;
+import com.ivan.MoviesRDF.enitity.Member;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.query.Query;
@@ -87,6 +88,33 @@ public class JenaService {
 
         qexec.close();
         return resultList;
+    }
+
+    public Member getMember(Long id) {
+        String queryString = "";
+        queryString += "SELECT ?id ?label ";
+        queryString += "WHERE { ";
+        queryString += "?member " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Person") + ". ";
+        queryString += "?member " + stringXML(RDFS, "label") + " ?label . ";
+        queryString += "?member " + stringXML(WBS, "id") + " " + id + " . ";
+        queryString += "?member " + stringXML(WBS, "id") + " ?id . ";
+
+        queryString += "} ";
+
+        Member member = null;
+        QueryExecution qexec = executeQuery(queryString);
+        ResultSet results = qexec.execSelect();
+        while (results.hasNext()) {
+            System.out.println("hasnextr");
+            QuerySolution soln = results.nextSolution();
+            RDFNode label = soln.get("label");
+            Literal idd = soln.getLiteral("id");
+
+            member = new Member(idd.getLong(), label.toString());
+        }
+
+        qexec.close();
+        return member;
     }
 
     private QueryExecution executeQuery(String queryString) {

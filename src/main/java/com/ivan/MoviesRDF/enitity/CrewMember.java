@@ -5,6 +5,10 @@ public class CrewMember extends Member {
     private String department;
     private String job;
 
+    public CrewMember(Long id, String name) {
+        super(id, name);
+    }
+
     public String getDepartment() {
         return department;
     }

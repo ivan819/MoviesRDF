@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import com.ivan.MoviesRDF.enitity.Company;
 import com.ivan.MoviesRDF.enitity.Genre;
+import com.ivan.MoviesRDF.enitity.Member;
 import com.ivan.MoviesRDF.service.JenaService;
 
 import org.apache.commons.io.IOUtils;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
@@ -39,6 +41,12 @@ public class MainController {
     public List<Company> getTest11Data() {
         return jenaService.getCompanyList().stream().sorted(Comparator.comparing(Company::getRevenue).reversed())
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping(value = "/member/{id}")
+    @ResponseBody
+    public Member getTest112Data(@PathVariable Long id) {
+        return jenaService.getMember(id);
     }
 
     @GetMapping(value = "/home")

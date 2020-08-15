@@ -5,6 +5,10 @@ public class CastMember extends Member {
     private Integer order;
     private String character;
 
+    public CastMember(Long id, String name) {
+        super(id, name);
+    }
+
     public Integer getOrder() {
         return order;
     }
