@@ -24,6 +24,7 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
@@ -149,43 +150,97 @@ public class JenaService {
         List<CastMember> resultList = new ArrayList<>();
 
         String queryString = "";
-        queryString += "SELECT ?id ?label ";
+        queryString += "SELECT ?cast ?id ?name ?character ?order ";
         queryString += "WHERE { ";
-        queryString += "?member " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Person") + ". ";
-        queryString += "?member " + stringXML(RDFS, "label") + " ?label . ";
-        queryString += "?member " + stringXML(WBS, "id") + " " + movieId + " . ";
-        queryString += "?member " + stringXML(WBS, "id") + " ?id . ";
+        queryString += "?movie " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Film") + " . ";
+        queryString += "?movie " + stringXML(WBS, "hasCast") + " ?cast . ";
+        queryString += "?movie " + stringXML(WBS, "id") + " " + movieId + " . ";
+        queryString += "?cast " + stringXML(RDF, "type") + " " + stringXML(WBS, "CastMember") + " . ";
+        queryString += "?cast " + stringXML(WBS, "hasPerson") + " ?person . ";
+
+        queryString += "?person " + stringXML(RDFS, "label") + " ?name . ";
+        queryString += "?person " + stringXML(WBS, "id") + " ?id . ";
+
+        queryString += "?cast " + stringXML(WBS, "hasOrder") + " ?order . ";
+        queryString += "?cast " + stringXML(WBS, "hasCharacter") + " ?character . ";
         queryString += "} ";
 
+        System.out.println(queryString);
         QueryExecution qexec = executeQuery(queryString);
+
         ResultSet results = qexec.execSelect();
+        System.out.println();
         while (results.hasNext()) {
             QuerySolution soln = results.nextSolution();
 
-            RDFNode label = soln.get("label");
-            Literal idd = soln.getLiteral("id");
+            Literal id = soln.getLiteral("id");
+            Literal name = soln.getLiteral("name");
+            Literal character = soln.getLiteral("character");
+            Literal order = soln.getLiteral("order");
 
-            resultList.add(new CastMember(idd.getLong(), label.toString()));
+            resultList.add(new CastMember(id.getLong(), name.getString(), order.getInt(), character.getString()));
         }
 
         qexec.close();
-        return null;
+        return resultList;
     }
 
     public List<CrewMember> getCrewMembers(Long movieId) {
-        return null;
+        List<CrewMember> resultList = new ArrayList<>();
+
+        String queryString = "";
+        queryString += "SELECT ?id ?deptname ?job ?name ";
+        queryString += " WHERE { ";
+        queryString += "?movie " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Film") + " . ";
+        queryString += "?movie " + stringXML(WBS, "id") + " " + movieId + " . ";
+        queryString += "?movie " + stringXML(WBS, "hasCrew") + " ?crew . ";
+        queryString += "?crew " + stringXML(RDF, "type") + " " + stringXML(WBS, "CrewMember") + " . ";
+        queryString += "?crew " + stringXML(WBS, "hasPerson") + " ?person . ";
+
+        // queryString += "?person " + stringXML(RDFS, "label") + " ?name . ";
+        // queryString += "?person " + stringXML(WBS, "id") + " ?id . ";
+
+        queryString += "?crew " + stringXML(WBS, "inJob") + " ?job . ";
+        queryString += "?crew " + stringXML(WBS, "inDepartment") + " ?dept . ";
+        queryString += "?dept " + stringXML(RDFS, "label") + " ?deptname . ";
+        queryString += "} ";
+        System.out.println(queryString);
+        QueryExecution qexec = executeQuery(queryString);
+
+        ResultSet results = qexec.execSelect();
+        System.out.println();
+        while (results.hasNext()) {
+            QuerySolution soln = results.nextSolution();
+
+            System.out.println(soln.getResource("person"));
+            // System.out.println(soln.getLiteral("name"));
+
+            System.out.println(soln.getLiteral("job"));
+            System.out.println(soln.getLiteral("deptname"));
+            // Literal id = soln.getLiteral("id");
+            // Literal name = soln.getLiteral("name");
+            Literal dept = soln.getLiteral("deptname");
+            Literal job = soln.getLiteral("job");
+
+            resultList.add(new CrewMember(1L, "name.getString()", dept.getString(), job.getString()));
+            // resultList.add(new CrewMember(id.getLong(), name.getString(),
+            // dept.getString(), job.getString()));
+        }
+
+        qexec.close();
+        return resultList;
     }
 
     public List<String> getKeywords(Long movieId) {
         return null;
     }
 
-    // TODO overloaded
-    public List<Movie> getMovieList() {
+    public Movie getMovie(Long movieId) {
         return null;
     }
 
-    public Movie getMovie(Long movieId) {
+    // TODO overloaded
+    public List<Movie> getMovieList() {
         return null;
     }
 

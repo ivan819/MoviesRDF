@@ -25,4 +25,10 @@ public class CrewMember extends Member {
         this.job = job;
     }
 
+    public CrewMember(Long id, String name, String department, String job) {
+        super(id, name);
+        this.department = department;
+        this.job = job;
+    }
+
 }

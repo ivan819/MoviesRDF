@@ -48,3 +48,11 @@
     margin-left: -15rem;
   }
 }
+
+.cut-text{
+  width : 100% !important;
+  overflow:hidden !important;
+  display:inline-block !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
