@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
+import com.ivan.MoviesRDF.enitity.Company;
 import com.ivan.MoviesRDF.enitity.Genre;
 import com.ivan.MoviesRDF.service.JenaService;
 
@@ -33,16 +34,18 @@ public class MainController {
         return "index";
     }
 
-    @GetMapping(value = "/app")
-    public String movies() {
+    @GetMapping(value = "/movie")
+    public String movies(Model model) {
 
-        return "app";
+        return "movie";
     }
 
-    @GetMapping(value = "/productions")
-    public String productions() {
+    @GetMapping(value = "/production")
+    public String productions(Model model) {
+        model.addAttribute("companylist", jenaService.getCompanyList().stream()
+                .sorted(Comparator.comparing(Company::getNumberMovies).reversed()).collect(Collectors.toList()));
 
-        return "index";
+        return "productions";
     }
 
     @GetMapping(value = "/about")
@@ -51,7 +54,7 @@ public class MainController {
         return "about";
     }
 
-    @GetMapping(value = "/genres")
+    @GetMapping(value = "/genre")
     public String genres(Model model) {
         model.addAttribute("genrelist", jenaService.getGenreList().stream()
                 .sorted(Comparator.comparing(Genre::getNumberMovies).reversed()).collect(Collectors.toList()));
