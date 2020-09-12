@@ -1,9 +1,13 @@
 package com.ivan.MoviesRDF.enitity;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
+import org.apache.jena.sparql.function.library.date;
 
 public class Movie {
 
@@ -53,7 +57,7 @@ public class Movie {
 
     @Override
     public String toString() {
-        return "Movie [genres=" + genres + ", id=" + id + ", title=" + title + "]";
+        return "Movie [genres=" + genres + ", id=" + id + ", title=" + title + " : " + releaseDate + "]";
     }
 
     public Long getBudget() {
@@ -104,8 +108,8 @@ public class Movie {
         this.tagline = tagline;
     }
 
-    public Float getPopularity() {
-        return popularity;
+    public Integer getPopularity() {
+        return Math.round(popularity);
     }
 
     public void setPopularity(Float popularity) {
@@ -113,7 +117,7 @@ public class Movie {
     }
 
     public Date getReleaseDate() {
-        SimpleDateFormat d = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat d = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
         try {
             return d.parse(this.releaseDate);
         } catch (ParseException e) {

@@ -416,8 +416,9 @@ public class JenaService {
             Movie m = new Movie(movie.getProperty(idProp).getLong(), movie.getProperty(labelProp).getString());
             m.setTagline(movie.getProperty(taglineProp).getString());
 
-            if (movie.getProperty(releaseProp) != null)
+            if (movie.getProperty(releaseProp) != null) {
                 m.setReleaseDate(movie.getProperty(releaseProp).getString());
+            }
 
             m.setPopularity(movie.getProperty(popularityProp).getFloat());
 

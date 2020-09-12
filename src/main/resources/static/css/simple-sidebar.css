@@ -56,3 +56,14 @@
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
 }
+.cut-text-lines {
+  display: inline-block !important;
+  display: -webkit-box !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  height: 4.5em !important;
+  -webkit-line-clamp: 3 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}

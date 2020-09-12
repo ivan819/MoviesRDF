@@ -47,7 +47,8 @@ public class MainController {
 
     @GetMapping(value = "/movie")
     public String movies(Model model) {
-        model.addAttribute("movielist", jenaService.getMovieList().stream().limit(100).collect(Collectors.toList()));
+        // jenaService.getMovieList().stream().limit(500).forEach(System.out::println);
+        model.addAttribute("movielist", jenaService.getMovieList().stream().limit(500).collect(Collectors.toList()));
         return "movie";
     }
 
@@ -148,7 +149,6 @@ public class MainController {
         File file = ResourceUtils.getFile("classpath:movies.ttl");
         InputStream fileStream = new FileInputStream(file);
         byte[] bytes = IOUtils.toByteArray(fileStream);
-        System.out.println("loaded and returned");
 
         fileStream.close();
         return new ResponseEntity<>(bytes, HttpStatus.OK);
@@ -160,7 +160,6 @@ public class MainController {
         File file = ResourceUtils.getFile("classpath:static/images/" + icon.replace(" ", "") + ".png");
         InputStream fileStream = new FileInputStream(file);
         byte[] bytes = IOUtils.toByteArray(fileStream);
-        System.out.println("loaded and returned");
 
         fileStream.close();
         return new ResponseEntity<>(bytes, HttpStatus.OK);
