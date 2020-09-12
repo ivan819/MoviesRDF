@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.ivan.MoviesRDF.enitity.CastMember;
@@ -82,7 +83,7 @@ public class JenaService {
 
     private final Property hasPersonProp;
 
-    static Model model = ModelFactory.createDefaultModel();
+    public static Model model = ModelFactory.createDefaultModel();
 
     public JenaService() {
 
@@ -121,14 +122,20 @@ public class JenaService {
         hasOrderProp = model.createProperty(wbs, "hasOrder");
         hasCharacterProp = model.createProperty(wbs, "hasCharacter");
         hasPersonProp = model.createProperty(wbs, "hasPerson");
-        try {
-            File file = ResourceUtils.getFile("classpath:movies.ttl");
-            InputStream fileStream = new FileInputStream(file);
-            model.read(fileStream, null, "TURTLE");
-            fileStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        Arrays.asList("movies", "cast", "crew", "movies1").stream().forEach(e -> {
+            try {
+                File file = ResourceUtils.getFile("classpath:" + e + ".ttl");
+                InputStream fileStream = new FileInputStream(file);
+                model.read(fileStream, null, "TURTLE");
+
+                fileStream.close();
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        });
+
     }
 
     public List<Genre> getGenreList() {

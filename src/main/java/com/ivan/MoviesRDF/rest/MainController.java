@@ -146,12 +146,13 @@ public class MainController {
     @ResponseBody
     @GetMapping(value = "/data", produces = { "text/turtle" })
     public ResponseEntity<?> data() throws IOException {
-        File file = ResourceUtils.getFile("classpath:movies.ttl");
-        InputStream fileStream = new FileInputStream(file);
-        byte[] bytes = IOUtils.toByteArray(fileStream);
 
-        fileStream.close();
-        return new ResponseEntity<>(bytes, HttpStatus.OK);
+        // File file = ResourceUtils.getFile("classpath:movies.ttl");
+        // InputStream fileStream = new FileInputStream(file);
+        // byte[] bytes = IOUtils.toByteArray(fileStream);
+
+        // fileStream.close();
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
     @ResponseBody
