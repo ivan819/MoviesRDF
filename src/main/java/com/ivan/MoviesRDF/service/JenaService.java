@@ -1,5 +1,6 @@
 package com.ivan.MoviesRDF.service;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -128,9 +129,11 @@ public class JenaService {
             // File file = ResourceUtils.getFile("classpath:" + e + ".ttl");
             // InputStream fileStream = new FileInputStream(file);
             InputStream fileStream = JenaService.class.getResourceAsStream("/" + e + ".ttl");
-            model.read(fileStream, null, "TURTLE");
+            BufferedInputStream bfi = new BufferedInputStream(fileStream);
+            model.read(bfi, null, "TURTLE");
 
             try {
+                bfi.close();
                 fileStream.close();
             } catch (IOException e1) {
                 // TODO Auto-generated catch block
