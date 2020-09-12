@@ -23,8 +23,10 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
@@ -35,9 +37,90 @@ public class JenaService {
     private static final String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
     private static final String RDFS = "http://www.w3.org/2000/01/rdf-schema#";
 
+    private final String rdfPath = "C:\\Users\\Duck\\Desktop\\movies.ttl";
+
+    private final String wbs = "http://prefix.com/#";
+    private final String dbpedia = "http://dbpedia.org/ontology/";
+    private final String rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    private final String rdfs = "http://www.w3.org/2000/01/rdf-schema#";
+    private final String xsd = "http://www.w3.org/2001/XMLSchema#";
+
+    private final Resource genreResource;
+    private final Resource productionCompanyResource;
+    private final Resource productionCountryResource;
+    private final Resource filmResource;
+    private final Resource personResource;
+    private final Resource departmentResource;
+    private final Resource crewResource;
+    private final Resource castResource;
+
+    private final Property isA;
+    private final Property genreProp;
+    private final Property keywordProp;
+    private final Property labelProp;
+    private final Property producedByProp;
+    private final Property producedInProp;
+    private final Property budgetProp;
+    private final Property homepageProp;
+    private final Property languageProp;
+    private final Property overviewProp;
+    private final Property taglineProp;
+    private final Property releaseProp;
+    private final Property popularityProp;
+    private final Property revenueProp;
+    private final Property runtimeProp;
+    private final Property idProp;
+
+    private final Property hasCrewProp;
+    private final Property hasCastProp;
+
+    private final Property hasOrderProp;
+    private final Property hasCharacterProp;
+
+    private final Property inDepartmentProp;
+    private final Property inJobProp;
+
+    private final Property hasPersonProp;
+
     static Model model = ModelFactory.createDefaultModel();
 
     public JenaService() {
+
+        genreResource = model.createResource(dbpedia + "Genre");
+        filmResource = model.createResource(dbpedia + "Film");
+        personResource = model.createResource(dbpedia + "Person");
+        departmentResource = model.createResource(dbpedia + "Department");
+        productionCompanyResource = model.createResource(dbpedia + "Company");
+        productionCountryResource = model.createResource(dbpedia + "Country");
+        crewResource = model.createResource(wbs + "CrewMember");
+        castResource = model.createResource(wbs + "CastMember");
+
+        isA = model.createProperty(rdf + "type");
+        genreProp = model.createProperty(dbpedia + "genre");
+        keywordProp = model.createProperty(wbs + "keyword");
+        labelProp = model.createProperty(rdfs + "label");
+        producedByProp = model.createProperty(dbpedia + "producedBy");
+        producedInProp = model.createProperty(wbs + "producedIn");
+        budgetProp = model.createProperty(dbpedia + "budget");
+        homepageProp = model.createProperty(dbpedia + "homepage");
+        languageProp = model.createProperty(dbpedia, "originalLanguage");
+        overviewProp = model.createProperty(rdfs, "comment");
+        taglineProp = model.createProperty(dbpedia, "tagline");
+        releaseProp = model.createProperty(dbpedia, "releaseDate");
+        popularityProp = model.createProperty(dbpedia, "popularity");
+        runtimeProp = model.createProperty(dbpedia, "runtime");
+        revenueProp = model.createProperty(dbpedia, "revenue");
+        idProp = model.createProperty(wbs, "id");
+
+        hasCrewProp = model.createProperty(wbs, "hasCrew");
+        hasCastProp = model.createProperty(wbs, "hasCast");
+
+        inDepartmentProp = model.createProperty(wbs, "inDepartment");
+        inJobProp = model.createProperty(wbs, "inJob");
+
+        hasOrderProp = model.createProperty(wbs, "hasOrder");
+        hasCharacterProp = model.createProperty(wbs, "hasCharacter");
+        hasPersonProp = model.createProperty(wbs, "hasPerson");
         try {
             File file = ResourceUtils.getFile("classpath:movies.ttl");
             InputStream fileStream = new FileInputStream(file);
@@ -165,11 +248,11 @@ public class JenaService {
         queryString += "?cast " + stringXML(WBS, "hasCharacter") + " ?character . ";
         queryString += "} ";
 
-        System.out.println(queryString);
+        // System.out.println(queryString);
         QueryExecution qexec = executeQuery(queryString);
 
         ResultSet results = qexec.execSelect();
-        System.out.println();
+
         while (results.hasNext()) {
             QuerySolution soln = results.nextSolution();
 
@@ -179,6 +262,82 @@ public class JenaService {
             Literal order = soln.getLiteral("order");
 
             resultList.add(new CastMember(id.getLong(), name.getString(), order.getInt(), character.getString()));
+        }
+
+        qexec.close();
+        return resultList;
+    }
+
+    public List<CastMember> getCastMembers2(Long movieId) {
+        List<CastMember> resultList = new ArrayList<>();
+
+        String queryString = "";
+        queryString += "SELECT ?cast ?person ";
+        queryString += "WHERE { ";
+        queryString += "?movie " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Film") + " . ";
+        queryString += "?movie " + stringXML(WBS, "hasCast") + " ?cast . ";
+        queryString += "?movie " + stringXML(WBS, "id") + " " + movieId + " . ";
+        // queryString += "?cast " + stringXML(RDF, "type") + " " + stringXML(WBS,
+        // "CastMember") + " . ";
+        // queryString += "?cast " + stringXML(WBS, "hasPerson") + " ?person . ";
+        queryString += "} ";
+
+        // System.out.println(queryString);
+        QueryExecution qexec = executeQuery(queryString);
+
+        ResultSet results = qexec.execSelect();
+
+        while (results.hasNext()) {
+            QuerySolution soln = results.nextSolution();
+
+            Resource cast = soln.getResource("cast");
+            Resource person = cast.getProperty(hasPersonProp).getResource();
+
+            Long id = person.getProperty(idProp).getLong();
+            String name = person.getProperty(labelProp).getString();
+            CastMember m = new CastMember(id, name);
+            m.setOrder(cast.getProperty(hasOrderProp).getInt());
+            m.setcCharacter(cast.getProperty(hasCharacterProp).getString());
+
+            resultList.add(m);
+
+        }
+
+        qexec.close();
+        return resultList;
+    }
+
+    public List<CastMember> getCastMembers3(Long movieId) {
+        List<CastMember> resultList = new ArrayList<>();
+
+        String queryString = "";
+        queryString += "SELECT ?cast ?person ";
+        queryString += "WHERE { ";
+        queryString += "?movie " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Film") + " . ";
+        queryString += "?movie " + stringXML(WBS, "hasCast") + " ?cast . ";
+        queryString += "?movie " + stringXML(WBS, "id") + " " + movieId + " . ";
+        queryString += "?cast " + stringXML(RDF, "type") + " " + stringXML(WBS, "CastMember") + " . ";
+        queryString += "?cast " + stringXML(WBS, "hasPerson") + " ?person . ";
+        queryString += "} ";
+
+        // System.out.println(queryString);
+        QueryExecution qexec = executeQuery(queryString);
+
+        ResultSet results = qexec.execSelect();
+
+        while (results.hasNext()) {
+            QuerySolution soln = results.nextSolution();
+            Resource cast = soln.getResource("cast");
+            Resource person = soln.getResource("person");
+
+            Long id = person.getProperty(idProp).getLong();
+            String name = person.getProperty(labelProp).getString();
+            CastMember m = new CastMember(id, name);
+            m.setOrder(cast.getProperty(hasOrderProp).getInt());
+            m.setcCharacter(cast.getProperty(hasCharacterProp).getString());
+
+            resultList.add(m);
+
         }
 
         qexec.close();
@@ -241,7 +400,35 @@ public class JenaService {
 
     // TODO overloaded
     public List<Movie> getMovieList() {
-        return null;
+        List<Movie> resultList = new ArrayList<>();
+        String queryString = "";
+        queryString += "SELECT ?movie ";
+        queryString += "WHERE { ";
+        queryString += "?movie " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Film") + ". ";
+        queryString += "} ";
+
+        QueryExecution qexec = executeQuery(queryString);
+        ResultSet results = qexec.execSelect();
+        while (results.hasNext()) {
+            QuerySolution soln = results.nextSolution();
+            Resource movie = soln.getResource("movie");
+
+            Movie m = new Movie(movie.getProperty(idProp).getLong(), movie.getProperty(labelProp).getString());
+            m.setTagline(movie.getProperty(taglineProp).getString());
+
+            if (movie.getProperty(releaseProp) != null)
+                m.setReleaseDate(movie.getProperty(releaseProp).getString());
+
+            m.setPopularity(movie.getProperty(popularityProp).getFloat());
+
+            m.setCastMembers(getCastMembers2(movie.getProperty(idProp).getLong()));
+            m.setGenres(getGenreList(movie.getProperty(idProp).getLong()));
+
+            resultList.add(m);
+        }
+
+        qexec.close();
+        return resultList;
     }
 
     private QueryExecution executeQuery(String queryString) {
