@@ -24,4 +24,9 @@ public class Genre {
         this.name = name;
         this.numberMovies = numberMovies;
     }
+
+    @Override
+    public String toString() {
+        return "Genre [name=" + name + "]";
+    }
 }
