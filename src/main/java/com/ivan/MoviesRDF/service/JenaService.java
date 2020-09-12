@@ -124,7 +124,7 @@ public class JenaService {
         hasCharacterProp = model.createProperty(wbs, "hasCharacter");
         hasPersonProp = model.createProperty(wbs, "hasPerson");
 
-        Arrays.asList("movies", "cast", "crew", "movies1").stream().forEach(e -> {
+        Arrays.asList("movies").stream().forEach(e -> {
             // try {
             // File file = ResourceUtils.getFile("classpath:" + e + ".ttl");
             // InputStream fileStream = new FileInputStream(file);
@@ -438,8 +438,8 @@ public class JenaService {
 
             m.setPopularity(movie.getProperty(popularityProp).getFloat());
 
-            m.setCastMembers(getCastMembers2(movie.getProperty(idProp).getLong()));
-            m.setGenres(getGenreList(movie.getProperty(idProp).getLong()));
+            // m.setCastMembers(getCastMembers2(movie.getProperty(idProp).getLong()));
+            // m.setGenres(getGenreList(movie.getProperty(idProp).getLong()));
 
             resultList.add(m);
         }
