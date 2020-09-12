@@ -89,7 +89,7 @@ public class MainController {
 
         List<Company> companies = jenaService.getCompanyList();
 
-        if (search != null && !search.isBlank()) {
+        if (search != null && !search.isEmpty()) {
             companies = companies.stream().filter(e -> e.getName().toLowerCase().contains(search.toLowerCase()))
                     .collect(Collectors.toList());
         }
