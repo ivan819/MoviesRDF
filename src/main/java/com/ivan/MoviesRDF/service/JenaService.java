@@ -124,16 +124,17 @@ public class JenaService {
         hasPersonProp = model.createProperty(wbs, "hasPerson");
 
         Arrays.asList("movies", "cast", "crew", "movies1").stream().forEach(e -> {
-            try {
-                File file = ResourceUtils.getFile("classpath:" + e + ".ttl");
-                InputStream fileStream = new FileInputStream(file);
-                model.read(fileStream, null, "TURTLE");
+            // try {
+            // File file = ResourceUtils.getFile("classpath:" + e + ".ttl");
+            // InputStream fileStream = new FileInputStream(file);
 
-                fileStream.close();
-            } catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
+            model.read(JenaService.class.getResourceAsStream("/" + e + ".ttl"), null, "TURTLE");
+
+            // fileStream.close();
+            // } catch (IOException e1) {
+            // // TODO Auto-generated catch block
+            // e1.printStackTrace();
+            // }
         });
 
     }
