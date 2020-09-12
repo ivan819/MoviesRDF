@@ -127,10 +127,15 @@ public class JenaService {
             // try {
             // File file = ResourceUtils.getFile("classpath:" + e + ".ttl");
             // InputStream fileStream = new FileInputStream(file);
+            InputStream fileStream = JenaService.class.getResourceAsStream("/" + e + ".ttl");
+            model.read(fileStream, null, "TURTLE");
 
-            model.read(JenaService.class.getResourceAsStream("/" + e + ".ttl"), null, "TURTLE");
-
-            // fileStream.close();
+            try {
+                fileStream.close();
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
             // } catch (IOException e1) {
             // // TODO Auto-generated catch block
             // e1.printStackTrace();
