@@ -143,6 +143,7 @@ public class JenaService {
             // // TODO Auto-generated catch block
             // e1.printStackTrace();
             // }
+
         });
 
     }
@@ -439,7 +440,7 @@ public class JenaService {
             m.setPopularity(movie.getProperty(popularityProp).getFloat());
 
             // m.setCastMembers(getCastMembers2(movie.getProperty(idProp).getLong()));
-            // m.setGenres(getGenreList(movie.getProperty(idProp).getLong()));
+            m.setGenres(getGenreList(movie.getProperty(idProp).getLong()));
 
             resultList.add(m);
         }
