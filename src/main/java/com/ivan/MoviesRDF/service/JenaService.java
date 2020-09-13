@@ -398,6 +398,7 @@ public class JenaService {
 
     private QueryExecution executeQuery(String queryString, String dataset) {
         if (!dataset.equals(currentDataset)) {
+            model.close();
             setupModel(dataset);
             currentDataset = dataset;
         }
@@ -408,6 +409,7 @@ public class JenaService {
     }
 
     private void setupModel(String dataset) {
+
         model = ModelFactory.createDefaultModel();
         if (dataset.equals("movies")) {
             InputStream fileStream = JenaService.class.getResourceAsStream("/movies1.ttl");
