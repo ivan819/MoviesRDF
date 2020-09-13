@@ -124,7 +124,7 @@ public class JenaService {
         hasCharacterProp = model.createProperty(wbs, "hasCharacter");
         hasPersonProp = model.createProperty(wbs, "hasPerson");
 
-        Arrays.asList("movies").stream().forEach(e -> {
+        Arrays.asList("movies", "movies1").stream().forEach(e -> {
             // try {
             // File file = ResourceUtils.getFile("classpath:" + e + ".ttl");
             // InputStream fileStream = new FileInputStream(file);
