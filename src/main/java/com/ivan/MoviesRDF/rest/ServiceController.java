@@ -48,7 +48,7 @@ public class ServiceController {
     @GetMapping(value = "/cast")
     @ResponseBody
     public List<CastMember> getCast(@RequestParam Long movieId) {
-        return jenaService.getCastMembers(movieId).stream().sorted(Comparator.comparing(CastMember::getOrder))
+        return jenaService.getCastMembers2(movieId).stream().sorted(Comparator.comparing(CastMember::getOrder))
                 .collect(Collectors.toList());
     }
 

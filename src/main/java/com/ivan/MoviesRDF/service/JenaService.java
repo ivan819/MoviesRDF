@@ -86,6 +86,8 @@ public class JenaService {
 
     public static Model model = ModelFactory.createDefaultModel();
 
+    public String currentDataset = "movies";
+
     public JenaService() {
 
         genreResource = model.createResource(dbpedia + "Genre");
@@ -124,27 +126,7 @@ public class JenaService {
         hasCharacterProp = model.createProperty(wbs, "hasCharacter");
         hasPersonProp = model.createProperty(wbs, "hasPerson");
 
-        Arrays.asList("movies", "movies1").stream().forEach(e -> {
-            // try {
-            // File file = ResourceUtils.getFile("classpath:" + e + ".ttl");
-            // InputStream fileStream = new FileInputStream(file);
-            InputStream fileStream = JenaService.class.getResourceAsStream("/" + e + ".ttl");
-            BufferedInputStream bfi = new BufferedInputStream(fileStream);
-            model.read(bfi, null, "TURTLE");
-
-            try {
-                bfi.close();
-                fileStream.close();
-            } catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-            // } catch (IOException e1) {
-            // // TODO Auto-generated catch block
-            // e1.printStackTrace();
-            // }
-
-        });
+        setupModel(currentDataset);
 
     }
 
@@ -158,7 +140,7 @@ public class JenaService {
         queryString += "?movie " + stringXML(DBPEDIA, "genre") + " ?genre . ";
         queryString += "} GROUP BY ?label";
 
-        QueryExecution qexec = executeQuery(queryString);
+        QueryExecution qexec = executeQuery(queryString, "movies");
         ResultSet results = qexec.execSelect();
         while (results.hasNext()) {
             QuerySolution soln = results.nextSolution();
@@ -168,6 +150,7 @@ public class JenaService {
         }
 
         qexec.close();
+
         return resultList;
     }
 
@@ -182,7 +165,7 @@ public class JenaService {
         queryString += "?movie " + stringXML(DBPEDIA, "genre") + " ?genre . ";
         queryString += "}";
 
-        QueryExecution qexec = executeQuery(queryString);
+        QueryExecution qexec = executeQuery(queryString, "movies");
         ResultSet results = qexec.execSelect();
         while (results.hasNext()) {
             QuerySolution soln = results.nextSolution();
@@ -191,6 +174,7 @@ public class JenaService {
         }
 
         qexec.close();
+
         return resultList;
     }
 
@@ -205,7 +189,7 @@ public class JenaService {
         queryString += "?movie " + stringXML(DBPEDIA, "revenue") + " ?revenue ";
         queryString += "} GROUP BY ?label";
 
-        QueryExecution qexec = executeQuery(queryString);
+        QueryExecution qexec = executeQuery(queryString, "movies");
         ResultSet results = qexec.execSelect();
         while (results.hasNext()) {
             QuerySolution soln = results.nextSolution();
@@ -216,6 +200,7 @@ public class JenaService {
         }
 
         qexec.close();
+
         return resultList;
     }
 
@@ -231,7 +216,7 @@ public class JenaService {
         queryString += "} ";
 
         Member member = null;
-        QueryExecution qexec = executeQuery(queryString);
+        QueryExecution qexec = executeQuery(queryString, "movies");
         ResultSet results = qexec.execSelect();
         while (results.hasNext()) {
             QuerySolution soln = results.nextSolution();
@@ -242,47 +227,8 @@ public class JenaService {
         }
 
         qexec.close();
+
         return member;
-    }
-
-    // TODO
-    public List<CastMember> getCastMembers(Long movieId) {
-        List<CastMember> resultList = new ArrayList<>();
-
-        String queryString = "";
-        queryString += "SELECT ?cast ?id ?name ?character ?order ";
-        queryString += "WHERE { ";
-        queryString += "?movie " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Film") + " . ";
-        queryString += "?movie " + stringXML(WBS, "hasCast") + " ?cast . ";
-        queryString += "?movie " + stringXML(WBS, "id") + " " + movieId + " . ";
-        queryString += "?cast " + stringXML(RDF, "type") + " " + stringXML(WBS, "CastMember") + " . ";
-        queryString += "?cast " + stringXML(WBS, "hasPerson") + " ?person . ";
-
-        queryString += "?person " + stringXML(RDFS, "label") + " ?name . ";
-        queryString += "?person " + stringXML(WBS, "id") + " ?id . ";
-
-        queryString += "?cast " + stringXML(WBS, "hasOrder") + " ?order . ";
-        queryString += "?cast " + stringXML(WBS, "hasCharacter") + " ?character . ";
-        queryString += "} ";
-
-        // System.out.println(queryString);
-        QueryExecution qexec = executeQuery(queryString);
-
-        ResultSet results = qexec.execSelect();
-
-        while (results.hasNext()) {
-            QuerySolution soln = results.nextSolution();
-
-            Literal id = soln.getLiteral("id");
-            Literal name = soln.getLiteral("name");
-            Literal character = soln.getLiteral("character");
-            Literal order = soln.getLiteral("order");
-
-            resultList.add(new CastMember(id.getLong(), name.getString(), order.getInt(), character.getString()));
-        }
-
-        qexec.close();
-        return resultList;
     }
 
     public List<CastMember> getCastMembers2(Long movieId) {
@@ -294,13 +240,10 @@ public class JenaService {
         queryString += "?movie " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Film") + " . ";
         queryString += "?movie " + stringXML(WBS, "hasCast") + " ?cast . ";
         queryString += "?movie " + stringXML(WBS, "id") + " " + movieId + " . ";
-        // queryString += "?cast " + stringXML(RDF, "type") + " " + stringXML(WBS,
-        // "CastMember") + " . ";
-        // queryString += "?cast " + stringXML(WBS, "hasPerson") + " ?person . ";
         queryString += "} ";
 
         // System.out.println(queryString);
-        QueryExecution qexec = executeQuery(queryString);
+        QueryExecution qexec = executeQuery(queryString, "cast");
 
         ResultSet results = qexec.execSelect();
 
@@ -321,6 +264,7 @@ public class JenaService {
         }
 
         qexec.close();
+
         return resultList;
     }
 
@@ -338,7 +282,7 @@ public class JenaService {
         queryString += "} ";
 
         // System.out.println(queryString);
-        QueryExecution qexec = executeQuery(queryString);
+        QueryExecution qexec = executeQuery(queryString, "cast");
 
         ResultSet results = qexec.execSelect();
 
@@ -358,6 +302,7 @@ public class JenaService {
         }
 
         qexec.close();
+
         return resultList;
     }
 
@@ -381,7 +326,7 @@ public class JenaService {
         queryString += "?dept " + stringXML(RDFS, "label") + " ?deptname . ";
         queryString += "} ";
         System.out.println(queryString);
-        QueryExecution qexec = executeQuery(queryString);
+        QueryExecution qexec = executeQuery(queryString, "crew");
 
         ResultSet results = qexec.execSelect();
         System.out.println();
@@ -404,6 +349,7 @@ public class JenaService {
         }
 
         qexec.close();
+
         return resultList;
     }
 
@@ -424,7 +370,7 @@ public class JenaService {
         queryString += "?movie " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Film") + ". ";
         queryString += "} ";
 
-        QueryExecution qexec = executeQuery(queryString);
+        QueryExecution qexec = executeQuery(queryString, "movies");
         ResultSet results = qexec.execSelect();
         while (results.hasNext()) {
             QuerySolution soln = results.nextSolution();
@@ -439,20 +385,52 @@ public class JenaService {
 
             m.setPopularity(movie.getProperty(popularityProp).getFloat());
 
-            // m.setCastMembers(getCastMembers2(movie.getProperty(idProp).getLong()));
+            m.setCastMembers(getCastMembers2(movie.getProperty(idProp).getLong()));
             m.setGenres(getGenreList(movie.getProperty(idProp).getLong()));
 
             resultList.add(m);
         }
 
         qexec.close();
+
         return resultList;
     }
 
-    private QueryExecution executeQuery(String queryString) {
+    private QueryExecution executeQuery(String queryString, String dataset) {
+        if (!dataset.equals(currentDataset)) {
+            setupModel(dataset);
+            currentDataset = dataset;
+        }
+
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.create(query, model);
         return qexec;
+    }
+
+    private void setupModel(String dataset) {
+        model = ModelFactory.createDefaultModel();
+        if (dataset.equals("movies")) {
+            InputStream fileStream = JenaService.class.getResourceAsStream("/movies1.ttl");
+            BufferedInputStream bfi = new BufferedInputStream(fileStream);
+            model.read(bfi, null, "TURTLE");
+            try {
+                bfi.close();
+                fileStream.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+
+        InputStream fileStream = JenaService.class.getResourceAsStream("/" + dataset + ".ttl");
+        BufferedInputStream bfi = new BufferedInputStream(fileStream);
+        model.read(bfi, null, "TURTLE");
+        try {
+            bfi.close();
+            fileStream.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
     }
 
     private String stringXML(String prefix, String object) {
