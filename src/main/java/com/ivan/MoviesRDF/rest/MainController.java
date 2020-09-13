@@ -1,5 +1,6 @@
 package com.ivan.MoviesRDF.rest;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -158,9 +159,13 @@ public class MainController {
     @ResponseBody
     @GetMapping(value = "/icon", produces = { "image/png" })
     public ResponseEntity<?> icon(@RequestParam String icon) throws IOException {
-        File file = ResourceUtils.getFile("classpath:static/images/" + icon.replace(" ", "") + ".png");
-        InputStream fileStream = new FileInputStream(file);
-        byte[] bytes = IOUtils.toByteArray(fileStream);
+        // File file = ResourceUtils.getFile("classpath:static/images/" + icon.replace("
+        // ", "") + ".png");
+        // InputStream fileStream = new FileInputStream(file);
+        InputStream fileStream = MainController.class
+                .getResourceAsStream("/static/images/" + icon.replace(" ", "") + ".png");
+        BufferedInputStream bfi = new BufferedInputStream(fileStream);
+        byte[] bytes = IOUtils.toByteArray(bfi);
 
         fileStream.close();
         return new ResponseEntity<>(bytes, HttpStatus.OK);
