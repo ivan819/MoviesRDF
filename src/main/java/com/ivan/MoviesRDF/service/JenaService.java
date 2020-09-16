@@ -358,7 +358,36 @@ public class JenaService {
     }
 
     public Movie getMovie(Long movieId) {
-        return null;
+        String queryString = "";
+        queryString += "SELECT ?movie ";
+        queryString += "WHERE { ";
+        queryString += "?movie " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Film") + ". ";
+        queryString += "?movie " + stringXML(WBS, "id") + " " + movieId + " . ";
+        queryString += "} ";
+
+        QueryExecution qexec = executeQuery(queryString, "movies");
+        ResultSet results = qexec.execSelect();
+
+        QuerySolution soln = results.nextSolution();
+        Resource movie = soln.getResource("movie");
+
+        System.out.println(movie.getProperty(hasCastProp));
+
+        Movie m = new Movie(movie.getProperty(idProp).getLong(), movie.getProperty(labelProp).getString());
+        m.setTagline(movie.getProperty(taglineProp).getString());
+
+        if (movie.getProperty(releaseProp) != null) {
+            m.setReleaseDate(movie.getProperty(releaseProp).getString());
+            System.out.println("werein");
+        }
+
+        m.setPopularity(movie.getProperty(popularityProp).getFloat());
+        m.setGenres(getGenreList(movie.getProperty(idProp).getLong()));
+        m.setCastMembers(getCastMembers2(movie.getProperty(idProp).getLong()));
+
+        qexec.close();
+
+        return m;
     }
 
     // TODO overloaded
@@ -381,6 +410,10 @@ public class JenaService {
 
             if (movie.getProperty(releaseProp) != null) {
                 m.setReleaseDate(movie.getProperty(releaseProp).getString());
+
+            } else {
+                m.setReleaseDate("");
+                System.out.println("werein");
             }
 
             m.setPopularity(movie.getProperty(popularityProp).getFloat());
@@ -397,11 +430,11 @@ public class JenaService {
     }
 
     private QueryExecution executeQuery(String queryString, String dataset) {
-        if (!dataset.equals(currentDataset)) {
-            model.close();
-            setupModel(dataset);
-            currentDataset = dataset;
-        }
+        // if (!dataset.equals(currentDataset)) {
+        // model.close();
+        // setupModel(dataset);
+        // currentDataset = dataset;
+        // }
 
         Query query = QueryFactory.create(queryString);
         QueryExecution qexec = QueryExecutionFactory.create(query, model);

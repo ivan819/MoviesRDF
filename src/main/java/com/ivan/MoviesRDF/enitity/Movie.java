@@ -123,7 +123,7 @@ public class Movie {
         } catch (ParseException e) {
 
         }
-        return null;
+        return new Date();
     }
 
     public void setReleaseDate(String releaseDate) {

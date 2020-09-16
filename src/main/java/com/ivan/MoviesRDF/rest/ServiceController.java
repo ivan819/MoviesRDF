@@ -9,6 +9,7 @@ import com.ivan.MoviesRDF.enitity.Company;
 import com.ivan.MoviesRDF.enitity.CrewMember;
 import com.ivan.MoviesRDF.enitity.Genre;
 import com.ivan.MoviesRDF.enitity.Member;
+import com.ivan.MoviesRDF.enitity.Movie;
 import com.ivan.MoviesRDF.service.JenaService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,12 @@ public class ServiceController {
     @ResponseBody
     public List<CrewMember> getCrew(@RequestParam Long movieId) {
         return jenaService.getCrewMembers(movieId).stream().collect(Collectors.toList());
+    }
+
+    @GetMapping(value = "/onemovie")
+    @ResponseBody
+    public Movie getCrew1(@RequestParam Long movieId) {
+        return jenaService.getMovie(movieId);
     }
 
 }
