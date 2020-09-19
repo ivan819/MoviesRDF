@@ -7,8 +7,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.jena.sparql.function.library.date;
-
 public class Movie {
 
     private Long id;
