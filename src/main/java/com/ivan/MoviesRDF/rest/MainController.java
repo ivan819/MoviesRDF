@@ -50,6 +50,7 @@ public class MainController {
     public String movies(Model model) {
         // jenaService.getMovieList().stream().limit(500).forEach(System.out::println);
         model.addAttribute("movielist", jenaService.getMovieList().stream().limit(500).collect(Collectors.toList()));
+        model.addAttribute("selectedMovie", jenaService.getMovie(364L));
         return "movie";
     }
 

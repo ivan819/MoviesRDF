@@ -13,6 +13,7 @@ import com.ivan.MoviesRDF.enitity.Movie;
 import com.ivan.MoviesRDF.service.JenaService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -49,11 +50,11 @@ public class ServiceController {
     @GetMapping(value = "/cast")
     @ResponseBody
     public List<CastMember> getCast(@RequestParam Long movieId) {
-        return jenaService.getCastMembers2(movieId).stream().sorted(Comparator.comparing(CastMember::getOrder))
+        return jenaService.getCastMembers(movieId).stream().sorted(Comparator.comparing(CastMember::getOrder))
                 .collect(Collectors.toList());
     }
 
-    @GetMapping(value = "/crew")
+    @GetMapping(value = "/crew", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public List<CrewMember> getCrew(@RequestParam Long movieId) {
         return jenaService.getCrewMembers(movieId).stream().collect(Collectors.toList());

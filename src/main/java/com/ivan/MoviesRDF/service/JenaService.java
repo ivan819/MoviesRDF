@@ -231,7 +231,7 @@ public class JenaService {
         return member;
     }
 
-    public List<CastMember> getCastMembers2(Long movieId) {
+    public List<CastMember> getCastMembers(Long movieId) {
         List<CastMember> resultList = new ArrayList<>();
 
         String queryString = "";
@@ -268,17 +268,15 @@ public class JenaService {
         return resultList;
     }
 
-    public List<CastMember> getCastMembers3(Long movieId) {
-        List<CastMember> resultList = new ArrayList<>();
+    public List<CrewMember> getCrewMembers(Long movieId) {
+        List<CrewMember> resultList = new ArrayList<>();
 
         String queryString = "";
         queryString += "SELECT ?cast ?person ";
         queryString += "WHERE { ";
         queryString += "?movie " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Film") + " . ";
-        queryString += "?movie " + stringXML(WBS, "hasCast") + " ?cast . ";
+        queryString += "?movie " + stringXML(WBS, "hasCrew") + " ?cast . ";
         queryString += "?movie " + stringXML(WBS, "id") + " " + movieId + " . ";
-        queryString += "?cast " + stringXML(RDF, "type") + " " + stringXML(WBS, "CastMember") + " . ";
-        queryString += "?cast " + stringXML(WBS, "hasPerson") + " ?person . ";
         queryString += "} ";
 
         // System.out.println(queryString);
@@ -288,14 +286,17 @@ public class JenaService {
 
         while (results.hasNext()) {
             QuerySolution soln = results.nextSolution();
+
             Resource cast = soln.getResource("cast");
-            Resource person = soln.getResource("person");
+
+            Statement s = cast.getProperty(hasPersonProp);
+            Resource person = s.getResource();
 
             Long id = person.getProperty(idProp).getLong();
             String name = person.getProperty(labelProp).getString();
-            CastMember m = new CastMember(id, name);
-            m.setOrder(cast.getProperty(hasOrderProp).getInt());
-            m.setcCharacter(cast.getProperty(hasCharacterProp).getString());
+            CrewMember m = new CrewMember(id, name);
+            m.setDepartment(cast.getProperty(inDepartmentProp).getResource().getProperty(labelProp).getString());
+            m.setJob(cast.getProperty(inJobProp).getString());
 
             resultList.add(m);
 
@@ -306,46 +307,61 @@ public class JenaService {
         return resultList;
     }
 
-    public List<CrewMember> getCrewMembers(Long movieId) {
-        List<CrewMember> resultList = new ArrayList<>();
+    public List<Company> getCompanyList(Long movieId) {
+        List<Company> resultList = new ArrayList<>();
 
         String queryString = "";
-        queryString += "SELECT ?id ?deptname ?job ?name ";
-        queryString += " WHERE { ";
+        queryString += "SELECT ?cast ";
+        queryString += "WHERE { ";
         queryString += "?movie " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Film") + " . ";
+        queryString += "?movie " + stringXML(DBPEDIA, "producedBy") + " ?cast . ";
         queryString += "?movie " + stringXML(WBS, "id") + " " + movieId + " . ";
-        queryString += "?movie " + stringXML(WBS, "hasCrew") + " ?crew . ";
-        queryString += "?crew " + stringXML(RDF, "type") + " " + stringXML(WBS, "CrewMember") + " . ";
-        queryString += "?crew " + stringXML(WBS, "hasPerson") + " ?person . ";
-
-        // queryString += "?person " + stringXML(RDFS, "label") + " ?name . ";
-        // queryString += "?person " + stringXML(WBS, "id") + " ?id . ";
-
-        queryString += "?crew " + stringXML(WBS, "inJob") + " ?job . ";
-        queryString += "?crew " + stringXML(WBS, "inDepartment") + " ?dept . ";
-        queryString += "?dept " + stringXML(RDFS, "label") + " ?deptname . ";
         queryString += "} ";
-        System.out.println(queryString);
-        QueryExecution qexec = executeQuery(queryString, "crew");
+
+        // System.out.println(queryString);
+        QueryExecution qexec = executeQuery(queryString, "cast");
 
         ResultSet results = qexec.execSelect();
-        System.out.println();
+
         while (results.hasNext()) {
             QuerySolution soln = results.nextSolution();
 
-            System.out.println(soln.getResource("person"));
-            // System.out.println(soln.getLiteral("name"));
+            Resource cast = soln.getResource("cast");
 
-            System.out.println(soln.getLiteral("job"));
-            System.out.println(soln.getLiteral("deptname"));
-            // Literal id = soln.getLiteral("id");
-            // Literal name = soln.getLiteral("name");
-            Literal dept = soln.getLiteral("deptname");
-            Literal job = soln.getLiteral("job");
+            Company c = new Company(cast.getProperty(labelProp).getString(), 0, 0);
 
-            resultList.add(new CrewMember(1L, "name.getString()", dept.getString(), job.getString()));
-            // resultList.add(new CrewMember(id.getLong(), name.getString(),
-            // dept.getString(), job.getString()));
+            resultList.add(c);
+
+        }
+
+        qexec.close();
+
+        return resultList;
+    }
+
+    public List<String> getCountryList(Long movieId) {
+        List<String> resultList = new ArrayList<>();
+
+        String queryString = "";
+        queryString += "SELECT ?cast ";
+        queryString += "WHERE { ";
+        queryString += "?movie " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Film") + " . ";
+        queryString += "?movie " + stringXML(WBS, "producedIn") + " ?cast . ";
+        queryString += "?movie " + stringXML(WBS, "id") + " " + movieId + " . ";
+        queryString += "} ";
+
+        // System.out.println(queryString);
+        QueryExecution qexec = executeQuery(queryString, "cast");
+
+        ResultSet results = qexec.execSelect();
+
+        while (results.hasNext()) {
+            QuerySolution soln = results.nextSolution();
+
+            Resource cast = soln.getResource("cast");
+
+            resultList.add(cast.getProperty(labelProp).getString());
+
         }
 
         qexec.close();
@@ -354,7 +370,26 @@ public class JenaService {
     }
 
     public List<String> getKeywords(Long movieId) {
-        return null;
+        List<String> resultList = new ArrayList<>();
+
+        String queryString = "";
+        queryString += "SELECT ?cast ?person ";
+        queryString += "WHERE { ";
+        queryString += "?movie " + stringXML(RDF, "type") + " " + stringXML(DBPEDIA, "Film") + " . ";
+        queryString += "?movie " + stringXML(WBS, "keyword") + " ?cast . ";
+        queryString += "?movie " + stringXML(WBS, "id") + " " + movieId + " . ";
+        queryString += "} ";
+        QueryExecution qexec = executeQuery(queryString, "cast");
+        ResultSet results = qexec.execSelect();
+
+        while (results.hasNext()) {
+            QuerySolution soln = results.nextSolution();
+            Literal cast = soln.getLiteral("cast");
+            resultList.add(cast.toString());
+        }
+
+        qexec.close();
+        return resultList;
     }
 
     public Movie getMovie(Long movieId) {
@@ -373,17 +408,28 @@ public class JenaService {
 
         System.out.println(movie.getProperty(hasCastProp));
 
-        Movie m = new Movie(movie.getProperty(idProp).getLong(), movie.getProperty(labelProp).getString());
-        m.setTagline(movie.getProperty(taglineProp).getString());
+        Movie m = new Movie(movieId, movie.getProperty(labelProp).getString());
 
         if (movie.getProperty(releaseProp) != null) {
             m.setReleaseDate(movie.getProperty(releaseProp).getString());
             System.out.println("werein");
         }
 
+        m.setTagline(movie.getProperty(taglineProp).getString());
         m.setPopularity(movie.getProperty(popularityProp).getFloat());
-        m.setGenres(getGenreList(movie.getProperty(idProp).getLong()));
-        m.setCastMembers(getCastMembers2(movie.getProperty(idProp).getLong()));
+        m.setBudget(movie.getProperty(budgetProp).getLong());
+        m.setRevenue(movie.getProperty(revenueProp).getLong());
+        m.setHomepage(movie.getProperty(homepageProp).getString());
+        m.setOverview(movie.getProperty(overviewProp).getString());
+        m.setRuntime(movie.getProperty(runtimeProp).getInt());
+        m.setOriginalLanguage(movie.getProperty(languageProp).getString());
+
+        m.setGenres(getGenreList(movieId));
+        m.setCastMembers(getCastMembers(movieId));
+        m.setCrewMembers(getCrewMembers(movieId));
+        m.setKeywords(getKeywords(movieId));
+        m.setProductionCompanies(getCompanyList(movieId));
+        m.setProductionCountries(getCountryList(movieId));
 
         qexec.close();
 
@@ -417,8 +463,7 @@ public class JenaService {
             }
 
             m.setPopularity(movie.getProperty(popularityProp).getFloat());
-
-            m.setCastMembers(getCastMembers2(movie.getProperty(idProp).getLong()));
+            m.setCastMembers(getCastMembers(movie.getProperty(idProp).getLong()));
             m.setGenres(getGenreList(movie.getProperty(idProp).getLong()));
 
             resultList.add(m);
