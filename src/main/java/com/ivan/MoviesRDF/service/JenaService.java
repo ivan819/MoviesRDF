@@ -1,7 +1,9 @@
 package com.ivan.MoviesRDF.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.ivan.MoviesRDF.enitity.CastMember;
 import com.ivan.MoviesRDF.enitity.Company;
@@ -163,7 +165,8 @@ public class JenaService extends JenaServiceData {
             resultList.add(m);
         }
         qexec.close();
-        return resultList;
+        return resultList.stream().sorted(Comparator.comparing(CastMember::getOrder)).collect(Collectors.toList());
+
     }
 
     public List<CrewMember> getCrewMembers(Long movieId) {
@@ -191,7 +194,7 @@ public class JenaService extends JenaServiceData {
             resultList.add(m);
         }
         qexec.close();
-        return resultList;
+        return resultList.stream().sorted(Comparator.comparing(CrewMember::getDepartment)).collect(Collectors.toList());
     }
 
     public List<String> getCountryList(Long movieId) {
@@ -245,12 +248,11 @@ public class JenaService extends JenaServiceData {
         ResultSet results = qexec.execSelect();
         QuerySolution soln = results.nextSolution();
         Resource movie = soln.getResource("movie");
-        System.out.println(movie.getProperty(hasCastProp));
+
         Movie m = new Movie(movieId, movie.getProperty(labelProp).getString());
 
         if (movie.getProperty(releaseProp) != null) {
             m.setReleaseDate(movie.getProperty(releaseProp).getString());
-            System.out.println("werein");
         }
 
         m.setTagline(movie.getProperty(taglineProp).getString());

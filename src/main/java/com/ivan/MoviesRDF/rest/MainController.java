@@ -43,10 +43,13 @@ public class MainController {
     }
 
     @GetMapping(value = "/movie")
-    public String movies(Model model) {
+    public String movies(Model model, @RequestParam(required = false) Long movieId) {
         // jenaService.getMovieList().stream().limit(500).forEach(System.out::println);
-        model.addAttribute("movielist", jenaService.getMovieList().stream().limit(500).collect(Collectors.toList()));
-        model.addAttribute("selectedMovie", jenaService.getMovie(364L));
+        model.addAttribute("movielist", jenaService.getMovieList().stream().limit(500)
+                .sorted(Comparator.comparing(Movie::getPopularity).reversed()).collect(Collectors.toList()));
+
+        if (movieId != null)
+            model.addAttribute("selectedMovie", jenaService.getMovie(movieId));
         return "movie";
     }
 
