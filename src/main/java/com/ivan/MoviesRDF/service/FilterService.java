@@ -19,7 +19,7 @@ public class FilterService {
     }
 
     public FilterService filter(String s) {
-        if (s != null && !s.isEmpty() && !s.isBlank())
+        if (s != null && !s.isEmpty())
             this.companies = this.companies.stream().filter(e -> e.getName().toLowerCase().contains(s.toLowerCase()))
                     .collect(Collectors.toList());
         return this;
