@@ -16,8 +16,7 @@
 </head>
 
 <body
-    style="background-image: url('/back.png'); background-repeat: repeat-y; background-size: cover; background-position: center center;">
-
+    style="background-image: url('/back.png'); background-repeat: repeat-y; background-size: contain; background-position: center center;">
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
@@ -87,8 +86,10 @@
             <form th:action="@{/production}" class="form-inline my-2 my-lg-0">
                 <input class="form-control mr-sm-2" type="search" name="search" id="search" placeholder="Search"
                     aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                <button class="btn btn-outline-success mr-sm-2 my-2 my-sm-0" type="submit">Search</button>
+                <a class="btn btn-outline-danger my-2 my-sm-0" href="/production?clear=1">Clear</a>
             </form>
+
 
         </div>
     </nav>
@@ -114,15 +115,18 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-sm-3">
-                                            <small class="card-text">Movies: </small>
-                                            <small class="card-text" th:text="${company.numberMovies}"></small>
+                                            <span class="card-text">Movies: </span>
+                                            <span class="card-text badge badge-pill badge-light ml-1"
+                                                th:text="${company.numberMovies}"></span>
+
                                         </div>
                                         <div class="col-sm-5">
-                                            <small class="card-text">Revenue: </small>
-                                            <small class="card-text" th:text="${company.revenue}"></small>
-                                            <small class="card-text"> $ </small>
+                                            <span class="card-text">Revenue: </span>
+                                            <span class="card-text badge badge-pill badge-light ml-1"
+                                                th:text="'$ '+${company.revenue}"></span>
                                         </div>
                                         <div class="col-sm-4">
+
                                             <a href="#" class="btn btn-info">More info</a>
                                         </div>
                                     </div>

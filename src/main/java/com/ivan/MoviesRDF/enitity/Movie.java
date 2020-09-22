@@ -29,6 +29,9 @@ public class Movie {
     private List<CrewMember> crewMembers;
     private List<CastMember> castMembers;
 
+    private String budgetString;
+    private String revenueString;
+
     public Movie() {
     }
 
@@ -62,16 +65,32 @@ public class Movie {
         return budget;
     }
 
+    public String getBudgetString() {
+        return budgetString;
+    }
+
     public void setBudget(Long budget) {
+
+        this.budgetString = formatMoney(budget);
         this.budget = budget;
+    }
+
+    private String formatMoney(Long budget) {
+        return String.format("%d%s $", budget > 1000000 ? budget / 1000000 : budget / 1000,
+                budget > 1000000 ? "M" : "K");
     }
 
     public Long getRevenue() {
         return revenue;
     }
 
+    public String getRevenueString() {
+        return revenueString;
+    }
+
     public void setRevenue(Long revenue) {
         this.revenue = revenue;
+        this.revenueString = formatMoney(revenue);
     }
 
     public String getHomepage() {

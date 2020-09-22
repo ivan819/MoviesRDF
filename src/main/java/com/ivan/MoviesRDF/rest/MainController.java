@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import com.ivan.MoviesRDF.enitity.Company;
 import com.ivan.MoviesRDF.enitity.Genre;
 import com.ivan.MoviesRDF.enitity.Movie;
+import com.ivan.MoviesRDF.service.FilterService;
 import com.ivan.MoviesRDF.service.JenaService;
 
 import org.apache.commons.io.IOUtils;
@@ -29,9 +30,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class MainController {
 
-    String resultsNumber = "100";
-    String orderBy = "numberMovies";
-    Boolean asc;
+    // String resultsDefault = "100";
+    // String orderBy = "numberMovies";
+    // Boolean asc;
 
     @Autowired
     JenaService jenaService;
@@ -55,66 +56,48 @@ public class MainController {
 
     @GetMapping(value = "/production")
     public String productions(Model model, HttpServletRequest request, @RequestParam(required = false) Integer limit,
-            @RequestParam(required = false) Integer sortType, @RequestParam(required = false) String search) {
+            @RequestParam(required = false) Integer sortType, @RequestParam(required = false) String search,
+            @RequestParam(required = false) Integer clear) {
 
-        Integer afterLimit = 0;
-        Integer afterSortType = 0;
         HttpSession session = request.getSession();
-        Boolean asc = (Boolean) session.getAttribute("asc");
-        if (asc == null)
-            asc = false;
-        if (limit == null && session.getAttribute("limit") == null) {
-            afterLimit = 100;
-        }
-        if (sortType == null && session.getAttribute("sortType") == null) {
-            afterSortType = 3;
+
+        if (clear != null && clear == 1) {
+            session.removeAttribute("asc");
+            session.removeAttribute("limit");
+            session.removeAttribute("sortType");
+            session.removeAttribute("search");
         }
 
-        if (session.getAttribute("limit") != null) {
-            afterLimit = (Integer) session.getAttribute("limit");
-        }
-        if (session.getAttribute("sortType") != null) {
-            afterSortType = (Integer) session.getAttribute("sortType");
+        // session
+        Boolean ascSession = (Boolean) session.getAttribute("asc");
+        Integer limitSession = (Integer) session.getAttribute("limit");
+        Integer sortTypeSession = (Integer) session.getAttribute("sortType");
+        String searchSession = (String) session.getAttribute("search");
 
-        }
+        // defaults
+        if (ascSession == null)
+            ascSession = false;
+        if (limitSession == null)
+            limitSession = 100;
+        if (sortTypeSession == null)
+            sortTypeSession = 3;
 
-        if (limit != null) {
-            afterLimit = limit;
-        }
+        // query
+        if (search != null)
+            searchSession = search;
+        if (limit != null)
+            limitSession = limit;
         if (sortType != null) {
-            afterSortType = sortType;
-            session.setAttribute("asc", !asc);
-        }
-        session.setAttribute("limit", afterLimit);
-        session.setAttribute("sortType", afterSortType);
-
-        List<Company> companies = jenaService.getCompanyList();
-
-        if (search != null && !search.isEmpty()) {
-            companies = companies.stream().filter(e -> e.getName().toLowerCase().contains(search.toLowerCase()))
-                    .collect(Collectors.toList());
+            sortTypeSession = sortType;
+            session.setAttribute("asc", !ascSession);
         }
 
-        if (afterSortType == 1) {
-            companies = companies.stream().sorted(Comparator.comparing(Company::getName)).collect(Collectors.toList());
+        session.setAttribute("limit", limitSession);
+        session.setAttribute("sortType", sortTypeSession);
+        session.setAttribute("search", searchSession);
 
-        } else if (afterSortType == 2) {
-            companies = companies.stream().sorted(Comparator.comparing(Company::getNumberMovies).reversed())
-                    .collect(Collectors.toList());
-
-        } else if (afterSortType == 3) {
-            companies = companies.stream().sorted(Comparator.comparing(Company::getRevenue).reversed())
-                    .collect(Collectors.toList());
-
-        }
-        if (asc) {
-            Collections.reverse(companies);
-        }
-        if (afterLimit != null && afterLimit != 0) {
-            companies = companies.stream().limit(afterLimit).collect(Collectors.toList());
-        }
-
-        model.addAttribute("companylist", companies);
+        model.addAttribute("companylist", FilterService.getCompanyFilter(jenaService.getCompanyList())
+                .filter(searchSession).order(sortTypeSession, ascSession).limit(limitSession).getList());
 
         return "productions";
     }
