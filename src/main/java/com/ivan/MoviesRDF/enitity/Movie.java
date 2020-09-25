@@ -130,6 +130,9 @@ public class Movie {
     }
 
     public void setPopularity(Float popularity) {
+        if (popularity == null) {
+            this.popularity = 0f;
+        }
         this.popularity = popularity;
     }
 

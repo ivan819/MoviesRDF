@@ -6,26 +6,26 @@ import java.util.stream.Collectors;
 
 import com.ivan.MoviesRDF.enitity.Company;
 
-public class FilterService {
+public class CompanyFilter {
     private List<Company> companies;
 
-    private FilterService(List<Company> companies) {
+    private CompanyFilter(List<Company> companies) {
         this.companies = companies;
     }
 
-    public static FilterService getCompanyFilter(List<Company> companies) {
-        FilterService fs = new FilterService(companies);
+    public static CompanyFilter getFilter(List<Company> companies) {
+        CompanyFilter fs = new CompanyFilter(companies);
         return fs;
     }
 
-    public FilterService filter(String s) {
+    public CompanyFilter filter(String s) {
         if (s != null && !s.isEmpty())
             this.companies = this.companies.stream().filter(e -> e.getName().toLowerCase().contains(s.toLowerCase()))
                     .collect(Collectors.toList());
         return this;
     }
 
-    public FilterService order(int orderType, boolean asc) {
+    public CompanyFilter order(int orderType, boolean asc) {
         Comparator<Company> c;
 
         switch (orderType) {
@@ -48,13 +48,13 @@ public class FilterService {
         return this;
     }
 
-    public FilterService limit(Integer limit) {
+    public CompanyFilter limit(Integer limit) {
         if (limit != 0)
             this.companies = this.companies.stream().limit(limit).collect(Collectors.toList());
         return this;
     }
 
-    public List<Company> getList() {
+    public List<Company> get() {
         return this.companies;
     }
 }

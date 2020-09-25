@@ -3,7 +3,6 @@ package com.ivan.MoviesRDF.rest;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,11 +10,11 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import com.ivan.MoviesRDF.enitity.Company;
 import com.ivan.MoviesRDF.enitity.Genre;
 import com.ivan.MoviesRDF.enitity.Movie;
-import com.ivan.MoviesRDF.service.FilterService;
+import com.ivan.MoviesRDF.service.CompanyFilter;
 import com.ivan.MoviesRDF.service.JenaService;
+import com.ivan.MoviesRDF.service.MovieFilter;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +43,48 @@ public class MainController {
     }
 
     @GetMapping(value = "/movie")
-    public String movies(Model model, @RequestParam(required = false) Long movieId) {
-        // jenaService.getMovieList().stream().limit(500).forEach(System.out::println);
-        model.addAttribute("movielist", jenaService.getMovieList().stream().limit(500)
-                .sorted(Comparator.comparing(Movie::getPopularity).reversed()).collect(Collectors.toList()));
+    public String movies(Model model, HttpServletRequest request, @RequestParam(required = false) Integer limit,
+            @RequestParam(required = false) Integer sortType, @RequestParam(required = false) String search,
+            @RequestParam(required = false) Integer clear, @RequestParam(required = false) Long movieId) {
+        HttpSession session = request.getSession();
+
+        if (clear != null && clear == 1) {
+            session.removeAttribute("movieasc");
+            session.removeAttribute("movielimit");
+            session.removeAttribute("moviesortType");
+            session.removeAttribute("moviesearch");
+        }
+
+        // session
+        Boolean ascSession = (Boolean) session.getAttribute("movieasc");
+        Integer limitSession = (Integer) session.getAttribute("movielimit");
+        Integer sortTypeSession = (Integer) session.getAttribute("moviesortType");
+        String searchSession = (String) session.getAttribute("moviesearch");
+
+        // defaults
+        if (ascSession == null)
+            ascSession = false;
+        if (limitSession == null)
+            limitSession = 100;
+        if (sortTypeSession == null)
+            sortTypeSession = 3;
+
+        // query
+        if (search != null)
+            searchSession = search;
+        if (limit != null)
+            limitSession = limit;
+        if (sortType != null) {
+            sortTypeSession = sortType;
+            session.setAttribute("movieasc", !ascSession);
+        }
+
+        session.setAttribute("movielimit", limitSession);
+        session.setAttribute("moviesortType", sortTypeSession);
+        session.setAttribute("moviesearch", searchSession);
+
+        model.addAttribute("movielist", MovieFilter.getFilter(jenaService.getMovieList()).filter(searchSession)
+                .order(sortTypeSession, ascSession).limit(limitSession).get());
 
         if (movieId != null)
             model.addAttribute("selectedMovie", jenaService.getMovie(movieId));
@@ -96,8 +133,8 @@ public class MainController {
         session.setAttribute("sortType", sortTypeSession);
         session.setAttribute("search", searchSession);
 
-        model.addAttribute("companylist", FilterService.getCompanyFilter(jenaService.getCompanyList())
-                .filter(searchSession).order(sortTypeSession, ascSession).limit(limitSession).getList());
+        model.addAttribute("companylist", CompanyFilter.getFilter(jenaService.getCompanyList()).filter(searchSession)
+                .order(sortTypeSession, ascSession).limit(limitSession).get());
 
         return "productions";
     }
@@ -130,26 +167,23 @@ public class MainController {
     @ResponseBody
     @GetMapping(value = "/data", produces = { "text/turtle" })
     public ResponseEntity<?> data() throws IOException {
+        InputStream fileStream = MainController.class.getResourceAsStream("/movies.ttl");
+        BufferedInputStream bfi = new BufferedInputStream(fileStream);
+        byte[] bytes = IOUtils.toByteArray(bfi);
 
-        // File file = ResourceUtils.getFile("classpath:movies.ttl");
-        // InputStream fileStream = new FileInputStream(file);
-        // byte[] bytes = IOUtils.toByteArray(fileStream);
-
-        // fileStream.close();
-        return new ResponseEntity<>(null, HttpStatus.OK);
+        fileStream.close();
+        return new ResponseEntity<>(bytes, HttpStatus.OK);
     }
 
     @ResponseBody
     @GetMapping(value = "/icon", produces = { "image/png" })
     public ResponseEntity<?> icon(@RequestParam String icon) throws IOException {
-        // File file = ResourceUtils.getFile("classpath:static/images/" + icon.replace("
-        // ", "") + ".png");
-        // InputStream fileStream = new FileInputStream(file);
         InputStream fileStream = MainController.class
                 .getResourceAsStream("/static/images/" + icon.replace(" ", "") + ".png");
         BufferedInputStream bfi = new BufferedInputStream(fileStream);
         byte[] bytes = IOUtils.toByteArray(bfi);
 
+        bfi.close();
         fileStream.close();
         return new ResponseEntity<>(bytes, HttpStatus.OK);
     }
