@@ -6,8 +6,6 @@ import java.util.stream.Collectors;
 
 import com.ivan.MoviesRDF.enitity.Movie;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 public class MovieFilter {
     private List<Movie> movies;
 
@@ -81,7 +79,7 @@ public class MovieFilter {
         try {
             this.movies = this.movies.stream().sorted(c).collect(Collectors.toList());
         } catch (Exception e) {
-            // TODO: handle exception
+            System.out.println(e);
         }
 
         return this;

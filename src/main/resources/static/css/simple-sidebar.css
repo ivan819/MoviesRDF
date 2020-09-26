@@ -67,3 +67,16 @@
   overflow: hidden !important;
   text-overflow: ellipsis !important;
 }
+
+.big-text{
+  font-size: 20px;
+}
+@font-face
+{
+    font-family: NosiferCaps-Regular;
+    src: url('Epilogue-VariableFont_wght.ttf');
+} 
+body{
+  font-family: NosiferCaps-Regular; 
+
+}

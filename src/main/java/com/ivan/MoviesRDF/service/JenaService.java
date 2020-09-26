@@ -114,7 +114,7 @@ public class JenaService extends JenaServiceData {
                 Company c = new Company(cast.getProperty(labelProp).getString(), 0, 0);
                 resultList.add(c);
             } catch (Exception exception) {
-                Statement s = cast.getProperty(labelProp);
+
             }
 
         }

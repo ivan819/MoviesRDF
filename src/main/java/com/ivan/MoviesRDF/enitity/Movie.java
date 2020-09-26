@@ -1,6 +1,7 @@
 package com.ivan.MoviesRDF.enitity;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -76,8 +77,20 @@ public class Movie {
     }
 
     private String formatMoney(Long budget) {
-        return String.format("%d%s $", budget > 1000000 ? budget / 1000000 : budget / 1000,
-                budget > 1000000 ? "M" : "K");
+        DecimalFormat df = new DecimalFormat("#.#");
+        String f = "";
+        if (budget > 1000000000)
+            f = "$ " + df.format(budget / 1000000000f) + "B";
+        else if (budget > 1000000)
+            f = "$ " + df.format(budget / 1000000f) + "M";
+        else if (budget > 1000)
+            f = "$ " + df.format(budget / 1000f) + "K";
+        else if (budget == 0)
+            f = "not available";
+        else
+            f = df.format(budget);
+
+        return f;
     }
 
     public Long getRevenue() {
