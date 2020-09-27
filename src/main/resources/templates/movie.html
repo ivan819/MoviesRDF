@@ -107,11 +107,11 @@
                                         <div class="card-header">
 
                                              <div class="row">
-                                                  <div class="col-sm-8">
+                                                  <div class="col-sm-8 d-flex align-items-center">
                                                        <h2 style="display: inline-block"
-                                                            th:text="${selectedMovie.title}" class="mr-3">
+                                                            th:text="${selectedMovie.title}" class="mr-3 mb-0">
                                                        </h2>
-                                                       <h2 style="display: inline-block">
+                                                       <h2 style="display: inline " class="mb-0">
                                                             <img data-toggle="tooltip" data-placement="top"
                                                                  th:title="${genre.name}"
                                                                  th:each="genre: ${selectedMovie.genres}"
@@ -121,11 +121,11 @@
 
                                                   </div>
 
-                                                  <div class="col-sm-3 mt-2">
-                                                       <h4 class="float-right" th:text="${#dates.format(selectedMovie.releaseDate, 'dd MMMMM, YYYY')}"></h4> 
+                                                  <div class="col-sm-3 d-flex align-items-center">
+                                                       <h4 class="float-right mb-0" th:text="${#dates.format(selectedMovie.releaseDate, 'dd MMMMM, YYYY')}"></h4> 
                                                   </div>
 
-                                                  <div class="col-sm-1 mt-2 text-danger">
+                                                  <div class="col-sm-1 text-danger d-flex align-items-center">
                                                        <a href="/movie"  class="btn btn-danger">
                                                             <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-x-circle float-right" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                                                  <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
@@ -162,7 +162,7 @@
                                              </div>
                                         </div>
                                         <div class="card-body pt-2">
-                                             <h5 class="card-text" th:text="${selectedMovie.tagline}"></h5>
+                                             <h5 class="card-text mt-3" th:text="${selectedMovie.tagline}"></h5>
                                              <hr/>
                                              <div class="row">
                                                   <div class="col-sm-9">
@@ -204,14 +204,12 @@
                                                        <table class="table table-sm">
                                                             <thead>
                                                                  <tr>
-                                                                      <th scope="col">#</th>
                                                                       <th scope="col">Name</th>
                                                                       <th scope="col">Character</th>
                                                                  </tr>
                                                             </thead>
                                                             <tbody>
                                                                  <tr th:each="cast: ${selectedMovie.castMembers}">
-                                                                      <th th:text="${cast.order}"></th>
                                                                       <td class="font-weight-bold" th:text="${cast.name}" scope="row"></td>
                                                                       <td th:text="${cast.character}"></td>
                                                                       

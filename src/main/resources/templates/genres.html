@@ -71,18 +71,18 @@
                                 <div class="card-header">
 
                                     <div class="row">
-                                        <div class="col-sm-2 mt-1">
+                                        <div class="col-sm-2 d-flex align-items-center">
                                             <img th:src="'icon?icon='+${genre.name}" class="img rounded" alt="..."
                                                 width=40 height=40>
                                         </div>
-                                        <div class="col-sm-4 mt-3">
-                                            <h5 class="cut-text" th:text="${genre.name}"></h5>
+                                        <div class="col-sm-4 d-flex align-items-center">
+                                            <h5 class="cut-text mb-0" th:text="${genre.name}"></h5>
                                         </div>
-                                        <div class="col-sm-2 mt-3">
-                                            <small class="card-text">### </small>
+                                        <div class="col-sm-2 d-flex align-items-center">
+                                            <small class="card-text"># </small>
                                             <small class="card-text" th:text="${genre.numberMovies}"></small>
                                         </div>
-                                        <div class="col-sm-4 mt-1">
+                                        <div class="col-sm-4 d-flex align-items-center">
                                             <a href="#" class="btn btn-info">See Movies</a>
                                         </div>
                                     </div>

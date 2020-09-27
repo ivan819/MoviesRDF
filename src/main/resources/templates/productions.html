@@ -71,7 +71,10 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="/production?limit=10">10</a>
+                        <a class="dropdown-item" href="/production?limit=25">25</a>
+                        <a class="dropdown-item" href="/production?limit=50">50</a>
                         <a class="dropdown-item" href="/production?limit=100">100</a>
+                        <a class="dropdown-item" href="/production?limit=500">500</a>
                         <a class="dropdown-item" href="/production?limit=0">All</a>
                     </div>
                 </li>
@@ -101,26 +104,26 @@
 
                                 <div class="card-header">
 
-                                    <h5 class="cut-text" th:text="${company.name}"></h5>
+                                    <h5 class="cut-text mb-0 mt-2" th:text="${company.name}"></h5>
 
                                 </div>
 
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="col-sm-3">
+                                        <div class="col-sm-3 d-flex align-items-center">
                                             <span class="card-text">Movies: </span>
                                             <span class="card-text badge badge-pill badge-light ml-1"
                                                 th:text="${company.numberMovies}"></span>
 
                                         </div>
-                                        <div class="col-sm-5">
-                                            <span class="card-text">Revenue: </span>
+                                        <div class="col-sm-5 d-flex align-items-center">
+                                            <span class=" card-text">Revenue: </span>
                                             <span class="card-text badge badge-pill badge-light ml-1"
                                                 th:text="${company.revenueString}"></span>
                                         </div>
-                                        <div class="col-sm-4">
+                                        <div class="col-sm-4 d-flex align-items-center">
 
-                                            <a href="#" class="btn btn-info">More info</a>
+                                            <a href=" #" class="btn btn-info">See movies</a>
                                         </div>
                                     </div>
                                 </div>
