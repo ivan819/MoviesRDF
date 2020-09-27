@@ -36,12 +36,48 @@ public class MovieFilter {
                         || jenaService.getMovie(e.getId()).getCrewMembers().stream()
                                 .anyMatch(ee -> ee.getName().toLowerCase().contains(s.toLowerCase()))
                         || jenaService.getMovie(e.getId()).getProductionCompanies().stream()
-                                .anyMatch(ee -> ee.getName().toLowerCase().contains(s.toLowerCase()))) {
+                                .anyMatch(ee -> ee.getName().toLowerCase().contains(s.toLowerCase()))
+                        || jenaService.getMovie(e.getId()).getProductionCountries().stream()
+                                .anyMatch(ee -> ee.toLowerCase().contains(s.toLowerCase()))
+                        || jenaService.getMovie(e.getId()).getGenres().stream()
+                                .anyMatch(ee -> ee.getName().equals(s))) {
                     return true;
                 }
                 return false;
             }).collect(Collectors.toList());
 
+        }
+
+        return this;
+    }
+
+    public MovieFilter filterGenre(String s) {
+        if (s != null && !s.isEmpty()) {
+
+            this.movies = this.movies.stream()
+                    .filter(e -> e.getGenres().stream().anyMatch(ee -> ee.getName().equals(s)))
+                    .collect(Collectors.toList());
+        }
+
+        return this;
+    }
+
+    public MovieFilter filterCompany(String s) {
+        if (s != null && !s.isEmpty()) {
+
+            this.movies = this.movies.stream().filter(e -> jenaService.getMovie(e.getId()).getProductionCompanies()
+                    .stream().anyMatch(ee -> ee.getName().equals(s))).collect(Collectors.toList());
+        }
+
+        return this;
+    }
+
+    public MovieFilter filterCountry(String s) {
+        if (s != null && !s.isEmpty()) {
+
+            this.movies = this.movies.stream().filter(
+                    e -> jenaService.getMovie(e.getId()).getProductionCountries().stream().anyMatch(ee -> ee.equals(s)))
+                    .collect(Collectors.toList());
         }
 
         return this;
@@ -78,6 +114,7 @@ public class MovieFilter {
 
         try {
             this.movies = this.movies.stream().sorted(c).collect(Collectors.toList());
+            // this.movies.stream().map(Movie::getRuntime).forEach(System.out::println);
         } catch (Exception e) {
             System.out.println(e);
         }

@@ -45,7 +45,9 @@ public class MainController {
     @GetMapping(value = "/movie")
     public String movies(Model model, HttpServletRequest request, @RequestParam(required = false) Integer limit,
             @RequestParam(required = false) Integer sortType, @RequestParam(required = false) String search,
-            @RequestParam(required = false) Integer clear, @RequestParam(required = false) Long movieId) {
+            @RequestParam(required = false) Integer clear, @RequestParam(required = false) Long movieId,
+            @RequestParam(required = false) String genre, @RequestParam(required = false) String prod,
+            @RequestParam(required = false) String country) {
         HttpSession session = request.getSession();
 
         if (clear != null && clear == 1) {
@@ -83,8 +85,10 @@ public class MainController {
         session.setAttribute("moviesortType", sortTypeSession);
         session.setAttribute("moviesearch", searchSession);
 
-        model.addAttribute("movielist", MovieFilter.getFilter(jenaService.getMovieList()).filter(searchSession)
-                .order(sortTypeSession, ascSession).limit(limitSession).get());
+        model.addAttribute("movielist",
+                MovieFilter.getFilter(jenaService.getMovieList()).filterGenre(genre).filterCompany(prod)
+                        .filterCountry(country).filter(searchSession).order(sortTypeSession, ascSession)
+                        .limit(limitSession).get());
 
         if (movieId != null)
             model.addAttribute("selectedMovie", jenaService.getMovie(movieId));

@@ -263,7 +263,7 @@ public class JenaService extends JenaServiceData {
         m.setTagline(movie.getProperty(taglineProp).getString());
         m.setPopularity(movie.getProperty(popularityProp).getFloat());
         m.setBudget(movie.getProperty(budgetProp).getLong());
-        m.setRevenue(movie.getProperty(revenueProp).getLong() != 0 ? movie.getProperty(revenueProp).getLong() : 0);
+        m.setRevenue(movie.getProperty(revenueProp).getLong());
         m.setHomepage(movie.getProperty(homepageProp).getString());
         m.setOverview(movie.getProperty(overviewProp).getString());
         m.setRuntime(movie.getProperty(runtimeProp).getInt());
@@ -304,6 +304,9 @@ public class JenaService extends JenaServiceData {
             m.setCastMembers(getCastMembers(movie.getProperty(idProp).getLong()));
             m.setGenres(getGenreList(movie.getProperty(idProp).getLong()));
             m.setOverview(movie.getProperty(overviewProp).getString());
+            m.setRuntime(movie.getProperty(runtimeProp).getInt());
+            m.setBudget(movie.getProperty(budgetProp).getLong());
+            m.setRevenue(movie.getProperty(revenueProp).getLong());
             resultList.add(m);
         }
         qexec.close();
