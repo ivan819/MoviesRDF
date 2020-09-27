@@ -47,7 +47,7 @@ public class MainController {
             @RequestParam(required = false) Integer sortType, @RequestParam(required = false) String search,
             @RequestParam(required = false) Integer clear, @RequestParam(required = false) Long movieId,
             @RequestParam(required = false) String genre, @RequestParam(required = false) String prod,
-            @RequestParam(required = false) String country) {
+            @RequestParam(required = false) String country, @RequestParam(required = false) Boolean asc) {
         HttpSession session = request.getSession();
 
         if (clear != null && clear == 1) {
@@ -80,6 +80,10 @@ public class MainController {
             sortTypeSession = sortType;
             session.setAttribute("movieasc", !ascSession);
         }
+        if (asc != null) {
+            ascSession = asc;
+            session.setAttribute("movieasc", false);
+        }
 
         session.setAttribute("movielimit", limitSession);
         session.setAttribute("moviesortType", sortTypeSession);
@@ -90,8 +94,10 @@ public class MainController {
                         .filterCountry(country).filter(searchSession).order(sortTypeSession, ascSession)
                         .limit(limitSession).get());
 
-        if (movieId != null)
+        if (movieId != null) {
             model.addAttribute("selectedMovie", jenaService.getMovie(movieId));
+        }
+
         return "movie";
     }
 

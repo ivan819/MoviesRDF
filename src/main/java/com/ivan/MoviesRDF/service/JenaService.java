@@ -3,6 +3,7 @@ package com.ivan.MoviesRDF.service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import com.ivan.MoviesRDF.enitity.CastMember;
@@ -243,6 +244,12 @@ public class JenaService extends JenaServiceData {
     }
 
     public Movie getMovie(Long movieId) {
+        if (movieId == 0) {
+            Random r = new Random();
+            List<Movie> list = getMovieList();
+            movieId = list.get(r.nextInt(list.size())).getId();
+
+        }
         String queryString = "";
         queryString += "SELECT ?movie ";
         queryString += "WHERE { ";
