@@ -50,6 +50,37 @@
     		<artifactId>jena-arq</artifactId>
     		<version>3.16.0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql -->
+		<!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core -->
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-core_2.12</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql -->
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-sql_2.12</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+
+
+   		<!-- fix java.lang.ClassNotFoundException: org.codehaus.commons.compiler.UncheckedCompileException -->
+		<dependency>
+			<groupId>org.codehaus.janino</groupId>
+			<artifactId>commons-compiler</artifactId>
+			<version>3.0.8</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.codehaus.janino/janino -->
+		<dependency>
+			<groupId>org.codehaus.janino</groupId>
+			<artifactId>janino</artifactId>
+			<version>3.0.8</version>
+		</dependency>
+
+		
+
 
 	</dependencies>
 

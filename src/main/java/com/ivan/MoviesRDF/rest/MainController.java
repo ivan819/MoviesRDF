@@ -1,6 +1,7 @@
 package com.ivan.MoviesRDF.rest;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Comparator;
@@ -10,13 +11,19 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.ivan.MoviesRDF.enitity.CastMember;
 import com.ivan.MoviesRDF.enitity.Genre;
 import com.ivan.MoviesRDF.enitity.Movie;
 import com.ivan.MoviesRDF.service.CompanyFilter;
-import com.ivan.MoviesRDF.service.JenaService;
 import com.ivan.MoviesRDF.service.MovieFilter;
+import com.ivan.MoviesRDF.service.MovieService;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.spark.sql.AnalysisException;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.SparkSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +41,7 @@ public class MainController {
     // Boolean asc;
 
     @Autowired
-    JenaService jenaService;
+    MovieService movieService;
 
     @GetMapping(value = "/home")
     public String home() {
@@ -90,12 +97,12 @@ public class MainController {
         session.setAttribute("moviesearch", searchSession);
 
         model.addAttribute("movielist",
-                MovieFilter.getFilter(jenaService.getMovieList()).filterGenre(genre).filterCompany(prod)
+                MovieFilter.getFilter(movieService.getMovieList()).filterGenre(genre).filterCompany(prod)
                         .filterCountry(country).filter(searchSession).order(sortTypeSession, ascSession)
                         .limit(limitSession).get());
 
         if (movieId != null) {
-            model.addAttribute("selectedMovie", jenaService.getMovie(movieId));
+            model.addAttribute("selectedMovie", movieService.getMovie(movieId));
         }
 
         return "movie";
@@ -143,7 +150,7 @@ public class MainController {
         session.setAttribute("sortType", sortTypeSession);
         session.setAttribute("search", searchSession);
 
-        model.addAttribute("companylist", CompanyFilter.getFilter(jenaService.getCompanyList()).filter(searchSession)
+        model.addAttribute("companylist", CompanyFilter.getFilter(movieService.getCompanyList()).filter(searchSession)
                 .order(sortTypeSession, ascSession).limit(limitSession).get());
 
         return "productions";
@@ -159,7 +166,7 @@ public class MainController {
     public String tset() {
         Long start = System.currentTimeMillis();
 
-        List<Movie> list2 = jenaService.getMovieList();
+        List<Movie> list2 = movieService.getMovieList();
         Long list2finish = System.currentTimeMillis();
 
         list2.stream().forEach(System.out::println);
@@ -169,7 +176,7 @@ public class MainController {
 
     @GetMapping(value = "/genre")
     public String genres(Model model) {
-        model.addAttribute("genrelist", jenaService.getGenreList().stream()
+        model.addAttribute("genrelist", movieService.getGenreList().stream()
                 .sorted(Comparator.comparing(Genre::getNumberMovies).reversed()).collect(Collectors.toList()));
         return "genres";
     }
@@ -196,5 +203,100 @@ public class MainController {
         bfi.close();
         fileStream.close();
         return new ResponseEntity<>(bytes, HttpStatus.OK);
+    }
+
+    @Autowired
+    SparkSession sparkSession;
+
+    @GetMapping(value = "/testeroni3")
+    @ResponseBody
+    public List<CastMember> tse12213t() throws AnalysisException {
+
+        List<CastMember> cast = movieService.getCastMembers(8967L);
+        Dataset<Row> dataFrame = sparkSession.createDataFrame(cast, CastMember.class);
+        dataFrame.show();
+        dataFrame.createOrReplaceTempView("cast");
+        dataFrame.write().mode(SaveMode.Overwrite).save("C:\\Users\\Duck\\Desktop\\genres.parquet");
+
+        // List<Movie> movies = movieService.getMovieList();
+        // Encoder<Movie> personEncoder = Encoders.bean(Movie.class);
+        // Dataset<Movie> dataFramemovies = sparkSession.createDataset(movies,
+        // personEncoder);
+        // dataFramemovies.show();
+        // dataFramemovies.createOrReplaceTempView("movie");
+        // dataFramemovies.write().mode(SaveMode.Append).save("C:\\Users\\Duck\\Desktop\\genres.parquet");
+
+        // Dataset<Row> dataset = sparkSession.sql("SELECT * FROM genre");
+        // List<Row> rows = dataset.collectAsList();
+
+        // return rows.stream().map(row -> {
+        // return new Genre(row.getString(0), row.getInt(1));
+        // }).collect(Collectors.toList());
+        return null;
+
+    }
+
+    @GetMapping(value = "/testeroni")
+    @ResponseBody
+    public List<Genre> tse12t() throws AnalysisException {
+
+        List<Genre> genres = movieService.getGenreList();
+        Dataset<Row> dataset = sparkSession.createDataFrame(genres, Genre.class);
+        // sparkSession.table(tableName)
+        dataset.show();
+        // dataFrame.createTempView("genre");
+        // / dataFrame.createGlobalTempView("genre");
+        dataset.write().mode(SaveMode.Append).option("path", "C:\\Users\\Duck\\Desktop\\testpni\\genres.parquet")
+                .saveAsTable("genre");
+        // File file = new File("C:\\Users\\Duck\\Desktop\\testpni\\genres.parquet");
+        // file.delete();
+        // dataFrame.write().save("C:\\Users\\Duck\\Desktop\\testpni\\genres.parquet");
+
+        // =======================
+
+        List<Row> rows = sparkSession.sql("SELECT * FROM genre").collectAsList();
+
+        return rows.stream().map(row -> {
+            return new Genre(row.getString(0), row.getInt(1));
+        }).collect(Collectors.toList());
+
+        // StructType structType = dataFrame.schema();
+
+        // RelationalGroupedDataset groupedDataset = dataFrame.groupBy(new
+        // Column("name"));
+
+        // List<Row> rows = groupedDataset.count().collectAsList();//
+        // JavaConversions.asScalaBuffer(words)).count();
+        // List<Row> rows2 = dataFrame.collectAsList();
+        // List<Row> rows3 = JavaConversions.asScalaBuffer(genres).count();
+        // groupedDataset.count().show();
+
+        // return rows.stream().map(new Function<Row, Genre>() {
+        // @Override
+        // public Genre apply(Row row) {
+        // return new Genre(row.getString(0), row.getInt(1));
+        // }
+        // }).collect(Collectors.toList());
+        // return null;
+
+    }
+
+    @GetMapping(value = "/testeroni2")
+    @ResponseBody
+    public List<Genre> tse122t() {
+        // sparkSession.sparkContext().addFile(path, minPartitions)
+        // sparkSession.catalog().listTables().collectAsList();
+        Dataset<Row> dataset = sparkSession.read().parquet("C:\\Users\\Duck\\Desktop\\testpni\\genres.parquet");
+        // Dataset<Row> dataset = sparkSession.sql("SELECT * FROM genre");
+        // sparkSession.sparkContext().
+        // Dataset<Row> dataset = sparkSession.read;
+
+        List<Row> rows = dataset.collectAsList();
+
+        return rows.stream().map(row -> {
+
+            return new Genre(row.getString(0), row.getInt(1));
+        }).collect(Collectors.toList());
+
     }
 }

@@ -1,6 +1,8 @@
 package com.ivan.MoviesRDF.enitity;
 
-public class Genre {
+import java.io.Serializable;
+
+public class Genre implements Serializable {
     private String name;
     private int numberMovies;
 
@@ -20,13 +22,18 @@ public class Genre {
         this.numberMovies = numberMovies;
     }
 
-    public Genre(String name, int numberMovies) {
+    public Genre(String name, int l) {
         this.name = name;
-        this.numberMovies = numberMovies;
+        this.numberMovies = l;
     }
 
     @Override
     public String toString() {
         return "Genre [name=" + name + "]";
     }
+
+    public Genre(String name) {
+        this.name = name;
+    }
+
 }

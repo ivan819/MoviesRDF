@@ -8,7 +8,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class Movie {
+import scala.Serializable;
+
+public class Movie implements Serializable {
 
     private Long id;
     private String title;

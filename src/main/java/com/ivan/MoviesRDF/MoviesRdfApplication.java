@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class MoviesRdfApplication {
 
 	public static void main(String[] args) {
+		System.setProperty("hadoop.home.dir", "C:\\Users\\Duck\\Desktop\\hadoop");
 		SpringApplication.run(MoviesRdfApplication.class, args);
 	}
 
