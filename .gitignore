@@ -4,6 +4,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+spark-warehouse/
+genres.parquet/
+
 ### STS ###
 .apt_generated
 .classpath
