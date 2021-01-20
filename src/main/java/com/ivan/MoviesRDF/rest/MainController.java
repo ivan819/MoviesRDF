@@ -17,6 +17,7 @@ import com.ivan.MoviesRDF.enitity.Movie;
 import com.ivan.MoviesRDF.service.CompanyFilter;
 import com.ivan.MoviesRDF.service.MovieFilter;
 import com.ivan.MoviesRDF.service.MovieService;
+import com.ivan.MoviesRDF.service.SparkRepository;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.sql.AnalysisException;
@@ -282,28 +283,38 @@ public class MainController {
 
     }
 
-    @GetMapping(value = "/testeroni2/{type}")
+    @Autowired
+    SparkRepository sparkRepo;
+
+    @GetMapping(value = "/testeroni2")
     @ResponseBody
-    public List<Object> tse122t(@PathVariable String type) {
-        // sparkSession.sparkContext().addFile(path, minPartitions)
-        // sparkSession.catalog().listTables().collectAsList();
-        Dataset<Row> dataset = sparkSession.read().parquet("C:\\Users\\Duck\\Desktop\\testpni\\" + type + ".parquet");
-        // Dataset<Row> dataset = sparkSession.sql("SELECT * FROM genre");
-        // sparkSession.sparkContext().
-        // Dataset<Row> dataset = sparkSession.read;
+    public String tse122t() {
 
-        List<Row> rows = dataset.collectAsList();
+        sparkRepo.getGenreList();
 
-        if (type.equals("genres")) {
-            return rows.stream().map(row -> {
+        return "gotem";
 
-                return new Genre(row.getString(0), row.getInt(1));
-            }).collect(Collectors.toList());
-        } else {
-            return rows.stream().map(row -> {
-                return new Company(row.getString(0), row.getInt(1), row.getLong(2));
-            }).collect(Collectors.toList());
-        }
+        // // sparkSession.sparkContext().addFile(path, minPartitions)
+        // // sparkSession.catalog().listTables().collectAsList();
+        // Dataset<Row> dataset =
+        // sparkSession.read().parquet("C:\\Users\\Duck\\Desktop\\testpni\\" + type +
+        // ".parquet");
+        // // Dataset<Row> dataset = sparkSession.sql("SELECT * FROM genre");
+        // // sparkSession.sparkContext().
+        // // Dataset<Row> dataset = sparkSession.read;
+
+        // List<Row> rows = dataset.collectAsList();
+
+        // if (type.equals("genres")) {
+        // return rows.stream().map(row -> {
+
+        // return new Genre(row.getString(0), row.getInt(1));
+        // }).collect(Collectors.toList());
+        // } else {
+        // return rows.stream().map(row -> {
+        // return new Company(row.getString(0), row.getInt(1), row.getLong(2));
+        // }).collect(Collectors.toList());
+        // }
 
     }
 }

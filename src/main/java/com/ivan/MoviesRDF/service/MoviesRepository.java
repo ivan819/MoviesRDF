@@ -11,7 +11,6 @@ import com.ivan.MoviesRDF.enitity.Movie;
 
 import org.springframework.stereotype.Repository;
 
-@Repository
 public interface MoviesRepository {
 
     public List<Genre> getGenreList();
