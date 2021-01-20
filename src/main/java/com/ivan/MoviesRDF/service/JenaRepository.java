@@ -26,7 +26,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class JenaService extends JenaServiceData {
+public class JenaRepository extends JenaServiceData implements MoviesRepository {
 
     public List<Genre> getGenreList() {
         List<Genre> resultList = new ArrayList<>();

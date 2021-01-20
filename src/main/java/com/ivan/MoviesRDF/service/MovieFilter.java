@@ -6,14 +6,16 @@ import java.util.stream.Collectors;
 
 import com.ivan.MoviesRDF.enitity.Movie;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 public class MovieFilter {
     private List<Movie> movies;
 
-    JenaService jenaService;
+    @Autowired
+    MovieService movieService;
 
     private MovieFilter(List<Movie> movies) {
         this.movies = movies;
-        this.jenaService = new JenaService();
     }
 
     public static MovieFilter getFilter(List<Movie> movies) {
@@ -29,17 +31,17 @@ public class MovieFilter {
                 if (e.getTitle().toLowerCase().contains(s.toLowerCase())
                         || e.getOverview().toLowerCase().contains(s.toLowerCase())
                         || e.getTagline().toLowerCase().contains(s.toLowerCase())
-                        || jenaService.getMovie(e.getId()).getKeywords().stream()
+                        || movieService.getMovie(e.getId()).getKeywords().stream()
                                 .anyMatch(ee -> ee.toLowerCase().contains(s.toLowerCase()))
-                        || jenaService.getMovie(e.getId()).getCastMembers().stream()
+                        || movieService.getMovie(e.getId()).getCastMembers().stream()
                                 .anyMatch(ee -> ee.getName().toLowerCase().contains(s.toLowerCase()))
-                        || jenaService.getMovie(e.getId()).getCrewMembers().stream()
+                        || movieService.getMovie(e.getId()).getCrewMembers().stream()
                                 .anyMatch(ee -> ee.getName().toLowerCase().contains(s.toLowerCase()))
-                        || jenaService.getMovie(e.getId()).getProductionCompanies().stream()
+                        || movieService.getMovie(e.getId()).getProductionCompanies().stream()
                                 .anyMatch(ee -> ee.getName().toLowerCase().contains(s.toLowerCase()))
-                        || jenaService.getMovie(e.getId()).getProductionCountries().stream()
+                        || movieService.getMovie(e.getId()).getProductionCountries().stream()
                                 .anyMatch(ee -> ee.toLowerCase().contains(s.toLowerCase()))
-                        || jenaService.getMovie(e.getId()).getGenres().stream()
+                        || movieService.getMovie(e.getId()).getGenres().stream()
                                 .anyMatch(ee -> ee.getName().equals(s))) {
                     return true;
                 }
@@ -65,7 +67,7 @@ public class MovieFilter {
     public MovieFilter filterCompany(String s) {
         if (s != null && !s.isEmpty()) {
 
-            this.movies = this.movies.stream().filter(e -> jenaService.getMovie(e.getId()).getProductionCompanies()
+            this.movies = this.movies.stream().filter(e -> movieService.getMovie(e.getId()).getProductionCompanies()
                     .stream().anyMatch(ee -> ee.getName().equals(s))).collect(Collectors.toList());
         }
 
@@ -75,9 +77,8 @@ public class MovieFilter {
     public MovieFilter filterCountry(String s) {
         if (s != null && !s.isEmpty()) {
 
-            this.movies = this.movies.stream().filter(
-                    e -> jenaService.getMovie(e.getId()).getProductionCountries().stream().anyMatch(ee -> ee.equals(s)))
-                    .collect(Collectors.toList());
+            this.movies = this.movies.stream().filter(e -> movieService.getMovie(e.getId()).getProductionCountries()
+                    .stream().anyMatch(ee -> ee.equals(s))).collect(Collectors.toList());
         }
 
         return this;

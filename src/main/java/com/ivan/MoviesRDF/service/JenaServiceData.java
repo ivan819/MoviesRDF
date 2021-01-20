@@ -91,7 +91,7 @@ public class JenaServiceData {
 
     private static void setupModel() {
         model = ModelFactory.createDefaultModel();
-        InputStream fileStream = JenaService.class.getResourceAsStream("/movies.ttl");
+        InputStream fileStream = JenaServiceData.class.getResourceAsStream("/movies.ttl");
         BufferedInputStream bfi = new BufferedInputStream(fileStream);
         model.read(bfi, null, "TURTLE");
         try {

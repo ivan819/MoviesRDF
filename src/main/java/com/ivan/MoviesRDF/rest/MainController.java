@@ -1,7 +1,6 @@
 package com.ivan.MoviesRDF.rest;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Comparator;
@@ -12,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.ivan.MoviesRDF.enitity.CastMember;
+import com.ivan.MoviesRDF.enitity.Company;
 import com.ivan.MoviesRDF.enitity.Genre;
 import com.ivan.MoviesRDF.enitity.Movie;
 import com.ivan.MoviesRDF.service.CompanyFilter;
@@ -30,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -238,15 +239,15 @@ public class MainController {
 
     @GetMapping(value = "/testeroni")
     @ResponseBody
-    public List<Genre> tse12t() throws AnalysisException {
+    public List<Company> tse12t() throws AnalysisException {
 
-        List<Genre> genres = movieService.getGenreList();
-        Dataset<Row> dataset = sparkSession.createDataFrame(genres, Genre.class);
+        List<Company> genres = movieService.getCompanyList();
+        Dataset<Row> dataset = sparkSession.createDataFrame(genres, Company.class);
         // sparkSession.table(tableName)
         dataset.show();
         // dataFrame.createTempView("genre");
         // / dataFrame.createGlobalTempView("genre");
-        dataset.write().mode(SaveMode.Append).option("path", "C:\\Users\\Duck\\Desktop\\testpni\\genres.parquet")
+        dataset.write().mode(SaveMode.Append).option("path", "C:\\Users\\Duck\\Desktop\\testpni\\company.parquet")
                 .saveAsTable("genre");
         // File file = new File("C:\\Users\\Duck\\Desktop\\testpni\\genres.parquet");
         // file.delete();
@@ -257,7 +258,7 @@ public class MainController {
         List<Row> rows = sparkSession.sql("SELECT * FROM genre").collectAsList();
 
         return rows.stream().map(row -> {
-            return new Genre(row.getString(0), row.getInt(1));
+            return new Company(row.getString(0), row.getInt(1), row.getLong(2));
         }).collect(Collectors.toList());
 
         // StructType structType = dataFrame.schema();
@@ -281,22 +282,28 @@ public class MainController {
 
     }
 
-    @GetMapping(value = "/testeroni2")
+    @GetMapping(value = "/testeroni2/{type}")
     @ResponseBody
-    public List<Genre> tse122t() {
+    public List<Object> tse122t(@PathVariable String type) {
         // sparkSession.sparkContext().addFile(path, minPartitions)
         // sparkSession.catalog().listTables().collectAsList();
-        Dataset<Row> dataset = sparkSession.read().parquet("C:\\Users\\Duck\\Desktop\\testpni\\genres.parquet");
+        Dataset<Row> dataset = sparkSession.read().parquet("C:\\Users\\Duck\\Desktop\\testpni\\" + type + ".parquet");
         // Dataset<Row> dataset = sparkSession.sql("SELECT * FROM genre");
         // sparkSession.sparkContext().
         // Dataset<Row> dataset = sparkSession.read;
 
         List<Row> rows = dataset.collectAsList();
 
-        return rows.stream().map(row -> {
+        if (type.equals("genres")) {
+            return rows.stream().map(row -> {
 
-            return new Genre(row.getString(0), row.getInt(1));
-        }).collect(Collectors.toList());
+                return new Genre(row.getString(0), row.getInt(1));
+            }).collect(Collectors.toList());
+        } else {
+            return rows.stream().map(row -> {
+                return new Company(row.getString(0), row.getInt(1), row.getLong(2));
+            }).collect(Collectors.toList());
+        }
 
     }
 }

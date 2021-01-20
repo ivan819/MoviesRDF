@@ -3,6 +3,7 @@ package com.ivan.MoviesRDF.enitity;
 import java.io.Serializable;
 
 public class Genre implements Serializable {
+
     private String name;
     private int numberMovies;
 
@@ -35,5 +36,7 @@ public class Genre implements Serializable {
     public Genre(String name) {
         this.name = name;
     }
+
+    private static final long serialVersionUID = 8664708577613822989L;
 
 }

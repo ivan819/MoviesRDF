@@ -1,23 +1,25 @@
 package com.ivan.MoviesRDF;
 
+import com.ivan.MoviesRDF.service.JenaRepository;
+import com.ivan.MoviesRDF.service.MoviesRepository;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.env.Environment;
 
 @Configuration
 @ComponentScan(basePackages = "com.ivan")
 @PropertySource("classpath:application.properties")
 public class Config {
-    @Autowired
-    private Environment env;
+
+    // @Autowired
+    // private Environment env;
 
     @Value("${spark.app.name}")
     private String appName;
@@ -52,5 +54,10 @@ public class Config {
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Bean
+    public MoviesRepository moviesRepository() {
+        return new JenaRepository();
     }
 }

@@ -233,4 +233,6 @@ public class Movie implements Serializable {
         this.productionCountries = productionCountries;
     }
 
+    private static final long serialVersionUID = 202995345597173719L;
+
 }

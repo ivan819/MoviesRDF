@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 public class MovieService {
 
     @Autowired
-    JenaService movieRepository;
+    MoviesRepository movieRepository;
 
     public List<Genre> getGenreList() {
         return movieRepository.getGenreList();
